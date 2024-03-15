@@ -43,6 +43,7 @@ namespace Editor.GameProject
                 if(_projectName != value)
                 {
                     _projectName = value;
+                    ValidateProjectPath();
                     OnPropertyChanged(nameof(ProjectName));
                 }
             }
@@ -57,15 +58,111 @@ namespace Editor.GameProject
                 if (_projectPath != value)
                 {
                     _projectPath = value;
+                    ValidateProjectPath();
                     OnPropertyChanged(nameof(ProjectPath));
                 }
             }
         }
 
+        private bool _isValid;
+        public bool IsValid
+        {
+            get => _isValid;
+            set
+            {
+                if (_isValid != value)
+                {
+                    _isValid = value;
+                    OnPropertyChanged(nameof(IsValid));
+                }
+            }
+        }
 
+        private string _errorMsg;
+        public string ErrorMsg
+        {
+            get => _errorMsg;
+            set
+            {
+                if (_errorMsg != value)
+                {
+                    _errorMsg = value;
+                    OnPropertyChanged(nameof(ErrorMsg));
+                }
+            }
+        }
+        
         private ObservableCollection<ProjectTemplate> _projectTemplates = new ObservableCollection<ProjectTemplate>();
         public ReadOnlyObservableCollection<ProjectTemplate> ProjectTemplates { get; }
 
+        private bool ValidateProjectPath()
+        {
+            var path = ProjectPath;
+            if (!path.EndsWith(@"\")) path += @"\";
+            path += $@"{ProjectName}\";
+
+            IsValid = false;
+            if (string.IsNullOrWhiteSpace(ProjectName.Trim()))
+            {
+                ErrorMsg = "Type in a project name.";
+            }
+            else if (ProjectName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            {
+                ErrorMsg = "Invalid char used in project name.";
+            }
+            else if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
+            {
+                ErrorMsg = "Select a valid project folder.";
+            }
+            else if(ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                ErrorMsg = "Invalid char used in project path.";
+            }
+            else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                ErrorMsg = "Selected project folder already exists and is not empty";
+            }
+            else
+            {
+                ErrorMsg = String.Empty;
+                IsValid = true;
+            }
+
+            return IsValid;
+        }
+
+        public string GenerateProject(ProjectTemplate template)
+        {
+            ValidateProjectPath();
+            if (!IsValid)
+            {
+                return string.Empty;
+            }
+
+            if (!ProjectPath.EndsWith(@"\")) ProjectPath += @"\";
+            var path = $@"{ProjectPath}{ProjectName}";
+
+            try
+            {
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                foreach (var folder in template.Folders)
+                {
+                    Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), folder)));
+                }
+
+                var dirInfo = new DirectoryInfo(path + @".Parimal");
+                dirInfo.Attributes |= FileAttributes.Hidden;
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
+                return "";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //TODO: LOG ERROR
+                return string.Empty;
+            }
+        }
         public CreateProject()
         {
             ProjectTemplates = new ReadOnlyObservableCollection<ProjectTemplate>(_projectTemplates);
@@ -84,6 +181,8 @@ namespace Editor.GameProject
                     
                     _projectTemplates.Add(template);
                 }
+                //Validate first time.
+                ValidateProjectPath();
             }
             catch (Exception ex)
             {
