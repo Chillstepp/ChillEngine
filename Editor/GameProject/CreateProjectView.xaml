@@ -12,16 +12,30 @@
     </UserControl.DataContext>
     <StackPanel Background="White">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <ListBox Width="195" Height="250"/>
-            <Border Width="400" Height="250" Margin="5,0,0,0"/>
+            <ListBox Width="195" Height="250" ItemsSource="{Binding ProjectTemplates}" Name = "TemplateListBox"
+                     SelectedIndex="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Icon}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding ProjectType}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Width="400" Height="250" Margin="5,0,0,0">
+                <Border.Background>
+                    <ImageBrush ImageSource="{Binding Path=SelectedItem.Screenshot, ElementName=TemplateListBox}"></ImageBrush>
+                </Border.Background>
+            </Border>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="Name" Width="50"/>
-            <TextBox Width="550" Text="{Binding Name}"/>
+            <TextBox Width="550" Text="{Binding ProjectName}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="Path" Width="50"/>
-            <TextBox Width="500" Text="{Binding Path}" />
+            <TextBox Width="500" Text="{Binding ProjectPath}" />
             <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
         </StackPanel>
         
