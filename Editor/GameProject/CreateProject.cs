@@ -49,7 +49,7 @@ namespace Editor.GameProject
             }
         }
 
-        private string _projectPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\ChillEngineProject\";
+        private string _projectPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\ChillEngineProjects\";
         public string ProjectPath
         {
             get => _projectPath;
@@ -140,7 +140,7 @@ namespace Editor.GameProject
             }
 
             if (!ProjectPath.EndsWith(@"\")) ProjectPath += @"\";
-            var path = $@"{ProjectPath}{ProjectName}";
+            var path = $@"{ProjectPath}{ProjectName}\";
 
             try
             {
@@ -150,11 +150,19 @@ namespace Editor.GameProject
                     Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), folder)));
                 }
 
-                var dirInfo = new DirectoryInfo(path + @".Parimal");
+                var dirInfo = new DirectoryInfo(path + @".Primal");
                 dirInfo.Attributes |= FileAttributes.Hidden;
                 File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
-                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
-                return "";
+                File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
+
+                // var project = new Project(ProjectName, path);
+                // Serializer.ToFile(project, path + $"{ProjectName}" + Project.Extension);
+                var projectXml = File.ReadAllText(template.ProjectFilePath);
+                projectXml = string.Format(projectXml, ProjectName, ProjectPath);
+                var projectnamedotprimal_path =
+                    Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
+                File.WriteAllText(projectnamedotprimal_path, projectXml);
+                return path;
             }
             catch (Exception e)
             {

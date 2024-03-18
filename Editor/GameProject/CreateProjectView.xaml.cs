@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Editor.GameProject
 {
@@ -7,6 +8,16 @@ namespace Editor.GameProject
         public CreateProjectView()
         {
             InitializeComponent();
+        }
+
+        private void OnCreateButton_Click(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as CreateProject;
+            var projectpath = vm.GenerateProject(TemplateListBox.SelectedItem as ProjectTemplate);
+            bool dialogResult = !string.IsNullOrEmpty(projectpath);
+            var win = Window.GetWindow(this);
+            win.DialogResult = dialogResult;
+            win.Close();
         }
     }
 }
