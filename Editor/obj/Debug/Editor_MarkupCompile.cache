@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-E:\ChillEngine\ChillEngine\Editor\obj\Debug\
+E:\ChillEngine\Editor\obj\Debug\
 Editor
 none
 false
 DEBUG;TRACE
-E:\ChillEngine\ChillEngine\Editor\App.xaml
+E:\ChillEngine\Editor\App.xaml
 4-1400553039
 
 14562690574
 141783760113
 GameProject\CreateProjectView.xaml;GameProject\OpenProjectView.xaml;GameProject\ProjectBrowserDialog.xaml;MainWindow.xaml;
 
-True
+False
 

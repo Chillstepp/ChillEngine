@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Editor.GameProject
 {
@@ -7,6 +8,11 @@ namespace Editor.GameProject
         public OpenProjectView()
         {
             InitializeComponent();
+        }
+
+        private void OnOpen_Button_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

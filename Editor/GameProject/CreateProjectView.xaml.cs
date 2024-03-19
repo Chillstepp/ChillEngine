@@ -14,8 +14,13 @@ namespace Editor.GameProject
         {
             var vm = DataContext as CreateProject;
             var projectpath = vm.GenerateProject(TemplateListBox.SelectedItem as ProjectTemplate);
-            bool dialogResult = !string.IsNullOrEmpty(projectpath);
             var win = Window.GetWindow(this);
+            bool dialogResult = false;
+            if(!string.IsNullOrEmpty(projectpath))
+            {
+                dialogResult = true;
+                var project = OpenProject.Open(new ProjectData() { ProjectName = vm.ProjectName, ProjectPath = projectpath });
+            }
             win.DialogResult = dialogResult;
             win.Close();
         }
