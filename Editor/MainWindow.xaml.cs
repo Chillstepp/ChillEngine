@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Editor.GameProject;
 
 namespace Editor
 {
@@ -24,6 +14,7 @@ namespace Editor
         {
             InitializeComponent();
             Loaded += OnMainWindowLoaded;
+            Closing += OnMainWindowClosing;
         }
         private void OnMainWindowLoaded(Object sender, RoutedEventArgs e)
         {
@@ -31,16 +22,23 @@ namespace Editor
             OpenProjectBrowserDialog();
         }
 
+        private void OnMainWindowClosing(Object sender, CancelEventArgs e)
+        {
+            Closing -= OnMainWindowClosing;
+            Project.Current?.UnLoad();
+        }
+
         private void OpenProjectBrowserDialog()
         {
             var projectBrowser = new GameProject.ProjectBrowserDialog();
-            if(projectBrowser.ShowDialog() == false)
+            if(projectBrowser.ShowDialog() == false || projectBrowser.DataContext == null)
             { 
                 Application.Current.Shutdown();
             }
             else
             {
-
+                Project.Current?.UnLoad();
+                DataContext = projectBrowser.DataContext;
             }
         }
     }

@@ -90,7 +90,7 @@ namespace Editor.GameProject
             //序列化：保存至xml
             WriteProjectData();
             
-            return null;
+            return Project.Load(project.FullPath);
         }
         static OpenProject()
         {

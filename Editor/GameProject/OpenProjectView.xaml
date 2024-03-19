@@ -14,6 +14,11 @@
             
             <ListBox Width="195" Height="250" ItemsSource="{Binding Projects }" Name = "ProjectsListBox"
                      SelectedIndex="0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="OnListBoxItem_Mouse_DoubleClick"></EventSetter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
