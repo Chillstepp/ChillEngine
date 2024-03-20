@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editor"
-        mc:Ignorable="d" ResizeMode="NoResize" 
-        Title="Editor" Height="450" Width="800">
+        xmlns:subeditor="clr-namespace:Editor.SubEditor"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+        Title="Editor" Height="1000" Width="1900">
     <Grid>
         
-           
+      <subeditor:WorldEditorView></subeditor:WorldEditorView>
 
     </Grid>
 </Window>

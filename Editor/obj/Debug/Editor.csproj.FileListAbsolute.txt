@@ -60,3 +60,9 @@ E:\ChillEngine\Editor\obj\Debug\Editor.csproj.GenerateResource.cache
 E:\ChillEngine\Editor\obj\Debug\Editor.csproj.CoreCompileInputs.cache
 E:\ChillEngine\Editor\obj\Debug\Editor.exe
 E:\ChillEngine\Editor\obj\Debug\Editor.pdb
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorView.g.cs
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorView.baml
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.g.cs
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.baml
+E:\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.g.cs
+E:\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.baml
