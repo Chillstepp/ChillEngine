@@ -32,10 +32,22 @@
                                         <Button Content="Remove"
                                                 Command="{Binding DataContext.RemoveSceneCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" Margin="20,0" Focusable="False"/>
+                                        <Button Content="+" IsEnabled="{Binding IsActive}" Click="OnAddGameEntity_Button_Click"></Button>
                                     </StackPanel>
                                 </Grid>
                             </Expander.Header>
-                            <Border Background="Blue" Height="100"></Border>
+                            <ListBox ItemsSource="{Binding GameEntities}" IsEnabled="{Binding IsActive}" SelectionMode="Extended"
+                                     SelectionChanged="OnGameEntities_ListBox_SelectionCHanged">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}"></TextBlock>
+                                            <Button Content="Remove" Command="{Binding ParentScene.RemoveGameEntityCommand}"
+                                                    CommandParameter="{Binding}"></Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
                         </Expander>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

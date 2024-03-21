@@ -5,13 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Editor.SubEditor"
              xmlns:utilities="clr-namespace:Editor.Utilities"
-             mc:Ignorable="d"
+             mc:Ignorable="d" Focusable="True"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.InputBindings>
+        <!-- HotKey Binding -->
         <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl" ></KeyBinding>
         <KeyBinding Command="{Binding RedoCommand}" Key="Y" Modifiers="Ctrl" ></KeyBinding>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl" ></KeyBinding>
-
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -44,7 +44,8 @@
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
                 <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"></GridSplitter>
-                <local:ProjectLayoutView></local:ProjectLayoutView>
+                <local:ProjectLayoutView Grid.Row="0"></local:ProjectLayoutView>
+                <local:GameEntityView Grid.Row="1"></local:GameEntityView>
             </Grid>
         </Grid>
         

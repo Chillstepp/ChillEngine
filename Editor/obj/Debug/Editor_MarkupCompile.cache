@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 E:\ChillEngine\Editor\App.xaml
-7-1526920060
+8-1891546313
 
-19-1947830253
-141783760113
-GameProject\CreateProjectView.xaml;GameProject\OpenProjectView.xaml;GameProject\ProjectBrowserDialog.xaml;MainWindow.xaml;SubEditor\WorldEditor\ProjectLayoutView.xaml;SubEditor\WorldEditor\WorldEditorView.xaml;Utilities\UndoRedoView.xaml;
+231790311441
+15-2101594550
+GameProject\CreateProjectView.xaml;GameProject\OpenProjectView.xaml;GameProject\ProjectBrowserDialog.xaml;MainWindow.xaml;SubEditor\WorldEditor\GameEntityView.xaml;SubEditor\WorldEditor\ProjectLayoutView.xaml;SubEditor\WorldEditor\WorldEditorView.xaml;Utilities\UndoRedoView.xaml;
 
 False
 

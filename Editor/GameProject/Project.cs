@@ -22,7 +22,7 @@ namespace Editor.GameProject
         [DataMember]
         public string Path { get; set; }
         
-        public string FullPath => $"{Path}{Name}{Extension}";
+        public string FullPath => $@"{Path}{Name}\{Name}{Extension}";
         
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new ObservableCollection<Scene>();
@@ -53,7 +53,7 @@ namespace Editor.GameProject
         
         public ICommand SaveCommand { get; private set; }
         
-        private void AddSceneIntennal(string sceneName)
+        private void AddSceneInternal(string sceneName)
         {
             Debug.Assert(!String.IsNullOrEmpty(sceneName.Trim()));
             _scenes.Add(new Scene(this, sceneName));
@@ -97,7 +97,7 @@ namespace Editor.GameProject
             
             AddSceneCommand = new RelayCommand<object>(x =>
             {
-                AddSceneIntennal($"New Scene {_scenes.Count}");
+                AddSceneInternal($"New Scene {_scenes.Count}");
                 var newScene = _scenes.Last();
                 var sceneIndex = _scenes.Count - 1;
 

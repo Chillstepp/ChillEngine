@@ -66,3 +66,5 @@ E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.g.cs
 E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.baml
 E:\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.g.cs
 E:\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.baml
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\GameEntityView.g.cs
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\GameEntityView.baml

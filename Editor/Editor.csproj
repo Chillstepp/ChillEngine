@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,9 +59,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\RelayCommand.cs" />
+    <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\GameEntity.cs" />
+    <Compile Include="Components\Transform.cs" />
     <Compile Include="GameProject\OpenProject.cs" />
     <Compile Include="GameProject\Project.cs" />
     <Compile Include="GameProject\Scene.cs" />
+    <Compile Include="SubEditor\WorldEditor\GameEntityView.xaml.cs">
+      <DependentUpon>GameEntityView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SubEditor\WorldEditor\ProjectLayoutView.xaml.cs">
       <DependentUpon>ProjectLayoutView.xaml</DependentUpon>
     </Compile>
@@ -98,6 +105,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SubEditor\WorldEditor\GameEntityView.xaml" />
     <Page Include="SubEditor\WorldEditor\ProjectLayoutView.xaml" />
     <Page Include="SubEditor\WorldEditor\WorldEditorView.xaml" />
     <Page Include="Utilities\UndoRedoView.xaml" />

@@ -4,6 +4,7 @@ FE:\ChillEngine\Editor\GameProject\CreateProjectView.xaml;;
 FE:\ChillEngine\Editor\GameProject\OpenProjectView.xaml;;
 FE:\ChillEngine\Editor\GameProject\ProjectBrowserDialog.xaml;;
 FE:\ChillEngine\Editor\MainWindow.xaml;;
+FE:\ChillEngine\Editor\SubEditor\WorldEditor\GameEntityView.xaml;;
 FE:\ChillEngine\Editor\SubEditor\WorldEditor\ProjectLayoutView.xaml;;
 FE:\ChillEngine\Editor\SubEditor\WorldEditor\WorldEditorView.xaml;;
 FE:\ChillEngine\Editor\Utilities\UndoRedoView.xaml;;

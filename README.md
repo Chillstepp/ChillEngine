@@ -2,7 +2,9 @@
 
 ## Editor
 
-- Undo/Redo pattern
+- XML Serialization
+
+- Undo/Redo Pattern
 
 ## Gameplay Arch
 
