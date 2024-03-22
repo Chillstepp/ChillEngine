@@ -33,7 +33,14 @@
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
                 <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"></GridSplitter>
-                <utilities:UndoRedoView DataContext="{Binding UndoRedo}" Grid.Row="1"/>
+                <TabControl Grid.Row="1">
+                    <TabItem>
+                        <utilities:UndoRedoView DataContext="{Binding UndoRedo}"/>
+                    </TabItem>
+                    <TabItem>
+                        <utilities:LoggerView></utilities:LoggerView>
+                    </TabItem>
+                </TabControl>
             </Grid>
             
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Left" VerticalAlignment="Stretch"></GridSplitter>

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 
 namespace Editor.GameProject
 {
@@ -10,6 +11,18 @@ namespace Editor.GameProject
         public ProjectBrowserDialog()
         {
             InitializeComponent();
+            Loaded += OnProjectBrowserDialogLoaded;
+        }
+
+        private void OnProjectBrowserDialogLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= OnProjectBrowserDialogLoaded;
+            if (!OpenProject.Projects.Any())
+            {
+                OpenProjectButton.IsEnabled = false;
+                OpenProjectView.Visibility = Visibility.Hidden;
+                OnToggleButton_Click(CreateProjectButton, new RoutedEventArgs());
+            }
         }
 
         private void OnToggleButton_Click(object sender, RoutedEventArgs e)

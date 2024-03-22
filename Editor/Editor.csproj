@@ -62,6 +62,7 @@
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\GameEntity.cs" />
     <Compile Include="Components\Transform.cs" />
+    <Compile Include="Dictionaries\ControlTemplates.xaml.cs" />
     <Compile Include="GameProject\OpenProject.cs" />
     <Compile Include="GameProject\Project.cs" />
     <Compile Include="GameProject\Scene.cs" />
@@ -74,11 +75,16 @@
     <Compile Include="SubEditor\WorldEditor\WorldEditorView.xaml.cs">
       <DependentUpon>WorldEditorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\Logger.cs" />
+    <Compile Include="Utilities\LoggerView.xaml.cs">
+      <DependentUpon>LoggerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\Serializer.cs" />
     <Compile Include="Utilities\UndoRedo.cs" />
     <Compile Include="Utilities\UndoRedoView.xaml.cs">
       <DependentUpon>UndoRedoView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dictionaries\ControlTemplates.xaml" />
     <Page Include="GameProject\CreateProjectView.xaml" />
     <Page Include="GameProject\OpenProjectView.xaml" />
     <Page Include="GameProject\ProjectBrowserDialog.xaml" />
@@ -108,6 +114,7 @@
     <Page Include="SubEditor\WorldEditor\GameEntityView.xaml" />
     <Page Include="SubEditor\WorldEditor\ProjectLayoutView.xaml" />
     <Page Include="SubEditor\WorldEditor\WorldEditorView.xaml" />
+    <Page Include="Utilities\LoggerView.xaml" />
     <Page Include="Utilities\UndoRedoView.xaml" />
   </ItemGroup>
   <ItemGroup>
