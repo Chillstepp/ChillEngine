@@ -13,7 +13,7 @@ using Editor.Utilities;
 namespace Editor.GameProject
 {
     [DataContract(Name = "Game")]
-    public class Project : ViewModeBase
+    class Project : ViewModeBase
     {
         public static string Extension { get; } = ".primal";
         [DataMember]

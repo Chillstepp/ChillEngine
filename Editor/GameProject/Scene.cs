@@ -10,7 +10,7 @@ using Editor.Utilities;
 namespace Editor.GameProject
 {
     [DataContract]
-    public class Scene : ViewModeBase
+    class Scene : ViewModeBase
     {
         private string _name;
         

@@ -1,5 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Input;
 using Editor.Common;
@@ -10,7 +13,7 @@ namespace Editor.Components
 {
     [DataContract]
     [KnownType(typeof(Transform))]
-    public class GameEntity : ViewModeBase
+    class GameEntity : ViewModeBase
     {
         public string _name;
 
@@ -28,8 +31,8 @@ namespace Editor.Components
             }
         }
         
-        public ICommand RenameCommand { get; private set; }
-        public ICommand IsEnableCommand { get; private set; }
+        // public ICommand RenameCommand { get; private set; }
+        // public ICommand IsEnableCommand { get; private set; }
 
         private bool _isEnabled = true;
 
@@ -62,22 +65,22 @@ namespace Editor.Components
                 OnPropertyChanged(nameof(Components));
             }
 
-            RenameCommand = new RelayCommand<string>(x =>
-            {
-                var oldName = _name;
-                Name = x;
-                Project.UndoRedo.Add(new UndoRedoAction(nameof(Name), this, oldName, x,
-                    $"Rename entity '{oldName}' to '{x}"));
-            }, x => x != _name);
-            
-            
-            IsEnableCommand = new RelayCommand<bool>(x =>
-            {
-                var oldValue = _isEnabled;
-                IsEnabled = x;
-                Project.UndoRedo.Add(new UndoRedoAction(nameof(IsEnabled), this, oldValue, x,
-                    x?$"Enable entity '{Name}'":$"Disable entity '{Name}'"));
-            });
+            // RenameCommand = new RelayCommand<string>(x =>
+            // {
+            //     var oldName = _name;
+            //     Name = x;
+            //     Project.UndoRedo.Add(new UndoRedoAction(nameof(Name), this, oldName, x,
+            //         $"Rename entity '{oldName}' to '{x}"));
+            // }, x => x != _name);
+            //
+            //
+            // IsEnableCommand = new RelayCommand<bool>(x =>
+            // {
+            //     var oldValue = _isEnabled;
+            //     IsEnabled = x;
+            //     Project.UndoRedo.Add(new UndoRedoAction(nameof(IsEnabled), this, oldValue, x,
+            //         x?$"Enable entity '{Name}'":$"Disable entity '{Name}'"));
+            // });
         }
         public GameEntity(Scene scene)
         {
@@ -88,5 +91,126 @@ namespace Editor.Components
         }
         
         
+    }
+
+    abstract class MSEntity : ViewModeBase
+    {
+        private bool _enableUpdates = true;
+        
+        private bool? _isEnabled;
+
+        public bool? IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled != value)
+                {
+                    _isEnabled = value;
+                    OnPropertyChanged(nameof(IsEnabled));
+                }
+            }
+        }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
+
+        private readonly ObservableCollection<IMSComponent> _components = new ObservableCollection<IMSComponent>();
+        public ReadOnlyObservableCollection<IMSComponent> Components { get; }
+        public List<GameEntity> SelectedEnties { get; }
+
+        public MSEntity(List<GameEntity>gameEntities)
+        {
+            Debug.Assert(gameEntities?.Any() == true);
+            Components = new ReadOnlyObservableCollection<IMSComponent>(_components);
+            SelectedEnties = gameEntities;
+            PropertyChanged += (s, e) => { if(_enableUpdates) UpdateGameEntities(e.PropertyName); };
+            
+        }
+
+        public static float? GetMixedValue(List<GameEntity> entities, Func<GameEntity, float> getProperty)
+        {
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
+            {
+                if (!value.IsTheSameAs(getProperty(entity)))
+                {
+                    return null;
+                }
+            }
+            return value;
+        }
+        
+        public static bool? GetMixedValue(List<GameEntity> entities, Func<GameEntity, bool> getProperty)
+        {
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
+            {
+                if (value != getProperty(entity))
+                {
+                    return null;
+                }
+            }
+            return value;
+        }
+        
+        public static string? GetMixedValue(List<GameEntity> entities, Func<GameEntity, string> getProperty)
+        {
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
+            {
+                if (value != getProperty(entity))
+                {
+                    return null;
+                }
+            }
+            return value;
+        }
+
+        protected virtual bool UpdateMSGameEntity()
+        {
+            IsEnabled = GetMixedValue(SelectedEnties, new Func<GameEntity, bool>(x => x.IsEnabled));
+            Name = GetMixedValue(SelectedEnties, new Func<GameEntity, string>(x => x.Name));
+            return true;
+        }
+
+        public void Refresh()
+        {
+            _enableUpdates = false;
+            UpdateMSGameEntity();
+            _enableUpdates = true;
+        }
+
+        protected virtual bool UpdateGameEntities(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case nameof(IsEnabled): SelectedEnties.ForEach(x => x.IsEnabled = IsEnabled.Value);
+                    return true;
+                case nameof(Name): SelectedEnties.ForEach(x => x.Name = Name);
+                    return true;
+            }
+            
+            return false;
+        }
+    }
+    
+    class MSGameEntity : MSEntity
+    {
+        public MSGameEntity(List<GameEntity>entities) : base(entities)
+        {
+            Refresh();
+        }
     }
 }

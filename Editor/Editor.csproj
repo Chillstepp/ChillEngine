@@ -84,6 +84,7 @@
     <Compile Include="Utilities\UndoRedoView.xaml.cs">
       <DependentUpon>UndoRedoView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\Utilities.cs" />
     <Page Include="Dictionaries\ControlTemplates.xaml" />
     <Page Include="GameProject\CreateProjectView.xaml" />
     <Page Include="GameProject\OpenProjectView.xaml" />
