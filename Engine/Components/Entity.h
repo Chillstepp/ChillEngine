@@ -1,15 +1,22 @@
-#pragma once
+﻿#pragma once
 
 #include "ComponentsCommonHeaders.h"
 
 namespace ChillEngine
 {
-
-    struct entity_info
+    #define INIT_INFO(component) namespace component {struct init_info;}
+    INIT_INFO(transform);
+    #undef INIT_INFO
+    
+    namespace game_entity
     {
-    
-    };
-    
-    u32 create_game_entity(const entity_info& info);
-    void remove_game_entity(u32 id);
+        struct entity_info
+        {
+            transform::init_info* transform = nullptr;
+        };
+        
+        entity create_game_entity(const entity_info& info);
+        void remove_game_entity(entity id);
+        bool is_alive(entity id);
+    }
 }
