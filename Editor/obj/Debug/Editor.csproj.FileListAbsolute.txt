@@ -73,3 +73,17 @@ E:\ChillEngine\Editor\obj\Debug\Dictionaries\ControlTemplates.baml
 E:\ChillEngine\Editor\obj\Debug\App.baml
 E:\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.g.cs
 E:\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Dictionaries\EditorColors.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Dictionaries\ControlTemplates.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\GameEntityView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\App.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Dictionaries\ControlTemplates.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\GameEntityView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.baml

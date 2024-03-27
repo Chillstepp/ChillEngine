@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Editor"
         xmlns:subeditor="clr-namespace:Editor.SubEditor"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="Editor" Height="1000" Width="1900">
+        Title="Editor" Height="1000" Width="1900"
+        Style="{StaticResource ChillEngineWindowStyle}">
     <Grid>
         
       <subeditor:WorldEditorView></subeditor:WorldEditorView>

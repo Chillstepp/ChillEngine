@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Utilities\Utilities.cs" />
     <Page Include="Dictionaries\ControlTemplates.xaml" />
+    <Page Include="Dictionaries\EditorColors.xaml" />
     <Page Include="GameProject\CreateProjectView.xaml" />
     <Page Include="GameProject\OpenProjectView.xaml" />
     <Page Include="GameProject\ProjectBrowserDialog.xaml" />
