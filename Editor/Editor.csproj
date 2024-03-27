@@ -63,6 +63,7 @@
     <Compile Include="Components\GameEntity.cs" />
     <Compile Include="Components\Transform.cs" />
     <Compile Include="Dictionaries\ControlTemplates.xaml.cs" />
+    <Compile Include="DLLWrapper\EngineAPI.cs" />
     <Compile Include="GameProject\OpenProject.cs" />
     <Compile Include="GameProject\Project.cs" />
     <Compile Include="GameProject\Scene.cs" />

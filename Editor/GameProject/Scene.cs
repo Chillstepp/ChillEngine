@@ -53,18 +53,24 @@ namespace Editor.GameProject
         
         public ICommand AddGameEntityCommand { get; private set; }
         public ICommand RemoveGameEntityCommand { get; private set; }
-        private void AddGameEntityInternal(GameEntity entity,int entityIdx)
+        private void AddGameEntityInternal(GameEntity entity,int entityIdx = -1)
         {
-            _gameEntities.Insert(entityIdx, entity);
+            Debug.Assert(!_gameEntities.Contains(entity));
+            entity.IsActive = IsActive;
+            if (entityIdx == -1)
+            {
+                _gameEntities.Add(entity);
+            }
+            else
+            {
+                _gameEntities.Insert(entityIdx, entity);   
+            }
         }
-        private void AddGameEntityInternal(GameEntity entity)
-        {
-            _gameEntities.Add(entity);
-        }
-        
+
         private void RemoveGameEntityInternal(GameEntity entity)
         {
             Debug.Assert(_gameEntities.Contains(entity));
+            entity.IsActive = false;
             _gameEntities.Remove(entity);
         }
         
@@ -80,6 +86,11 @@ namespace Editor.GameProject
             {
                 GameEntities = new ReadOnlyObservableCollection<GameEntity>(_gameEntities);
                 OnPropertyChanged(nameof(GameEntities));
+            }
+
+            foreach (var entity in _gameEntities)
+            {
+                entity.IsActive = IsActive;
             }
             AddGameEntityCommand = new RelayCommand<GameEntity>(x =>
             {
