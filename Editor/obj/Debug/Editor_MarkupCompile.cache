@@ -16,5 +16,5 @@ E:\ChillEngine\Editor\App.xaml
 15-2101594550
 Dictionaries\ControlTemplates.xaml;GameProject\CreateProjectView.xaml;GameProject\OpenProjectView.xaml;GameProject\ProjectBrowserDialog.xaml;MainWindow.xaml;SubEditor\WorldEditor\GameEntityView.xaml;SubEditor\WorldEditor\ProjectLayoutView.xaml;SubEditor\WorldEditor\WorldEditorView.xaml;Utilities\LoggerView.xaml;Utilities\UndoRedoView.xaml;
 
-False
+True
 

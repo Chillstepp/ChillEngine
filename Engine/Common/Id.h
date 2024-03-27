@@ -6,7 +6,7 @@
 /*
  *    |<---------------------------------id_type/id_mask---------------------------------->|
  *    x x x x    x x x x    x x x x    x x x x    x x x x    x x x x    x x x x    x x x x        
- *   |<-----------------------generation_id------------------------->||<-----index_id----->|
+ *   |<--generation_id-->||<--------------------------index_id--------------------------->|
  * 
  */   
 namespace ChillEngine::id

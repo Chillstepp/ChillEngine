@@ -10,3 +10,4 @@
 
 //common headers
 #include "PrimitiveTypes.h"
+#include "../Utilities/MathTypes.h"
