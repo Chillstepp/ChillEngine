@@ -4,15 +4,15 @@
 winexe
 C#
 .cs
-E:\ChillEngine\ChillEngine\Editor\obj\Debug\
+E:\ChillEngine\Editor\obj\Debug\
 Editor
 none
 false
 DEBUG;TRACE
-E:\ChillEngine\ChillEngine\Editor\App.xaml
+E:\ChillEngine\Editor\App.xaml
 11-541364340
 
-28-485836670
+31-1581678080
 15-2101594550
 Dictionaries\ControlTemplates.xaml;Dictionaries\EditorColors.xaml;GameProject\CreateProjectView.xaml;GameProject\OpenProjectView.xaml;GameProject\ProjectBrowserDialog.xaml;MainWindow.xaml;SubEditor\WorldEditor\GameEntityView.xaml;SubEditor\WorldEditor\ProjectLayoutView.xaml;SubEditor\WorldEditor\WorldEditorView.xaml;Utilities\LoggerView.xaml;Utilities\UndoRedoView.xaml;
 

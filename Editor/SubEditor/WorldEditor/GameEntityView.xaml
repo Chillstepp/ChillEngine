@@ -18,7 +18,7 @@
         </ScrollViewer.Style>
         <StackPanel>
             <Border Height="32">
-                <ToggleButton x:Name="addComponent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0">
+                <ToggleButton x:Name="AddComponent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0">
                     <ToggleButton.Content>
                         <DockPanel>
                             <TextBlock Text="AddComponent" Margin="5,0"></TextBlock>

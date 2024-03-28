@@ -87,3 +87,4 @@ E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ProjectLayoutV
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorView.baml
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.baml
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.baml
+E:\ChillEngine\Editor\obj\Debug\Dictionaries\EditorColors.baml

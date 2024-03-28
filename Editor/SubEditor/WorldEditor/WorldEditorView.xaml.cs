@@ -18,7 +18,7 @@ namespace Editor.SubEditor
             Loaded -= OnWorldEditorViewLoaded;
             Focus();
             //sometimes may lost focus, so focus again when UndoList change
-            ((INotifyCollectionChanged)Project.UndoRedo.UndoList).CollectionChanged += (s, e) => Focus();
+            // ((INotifyCollectionChanged)Project.UndoRedo.UndoList).CollectionChanged += (s, e) => Focus();
         }
     }
 }
