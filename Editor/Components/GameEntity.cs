@@ -180,43 +180,23 @@ namespace Editor.Components
             
         }
 
-        public static float? GetMixedValue(List<GameEntity> entities, Func<GameEntity, float> getProperty)
+        
+        public static float? GetMixedValue<T>(List<T> objs, Func<T, float> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (!value.IsTheSameAs(getProperty(entity)))
-                {
-                    return null;
-                }
-            }
-            return value;
+            var value = getProperty(objs.First());
+            return objs.Skip(1).Any(x => !getProperty(x).IsTheSameAs(value)) ? (float?) null : value;
         }
         
-        public static bool? GetMixedValue(List<GameEntity> entities, Func<GameEntity, bool> getProperty)
+        public static bool? GetMixedValue(List<GameEntity> objs, Func<GameEntity, bool> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (value != getProperty(entity))
-                {
-                    return null;
-                }
-            }
-            return value;
+            var value = getProperty(objs.First());
+            return objs.Skip(1).Any(x => getProperty(x) != value) ? (bool?) null : value;
         }
         
-        public static string? GetMixedValue(List<GameEntity> entities, Func<GameEntity, string> getProperty)
+        public static string GetMixedValue(List<GameEntity> objs, Func<GameEntity, string> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (value != getProperty(entity))
-                {
-                    return null;
-                }
-            }
-            return value;
+            var value = getProperty(objs.First());
+            return objs.Skip(1).Any(x => getProperty(x) != value) ? null : value;
         }
 
         protected virtual bool UpdateMSGameEntity()
