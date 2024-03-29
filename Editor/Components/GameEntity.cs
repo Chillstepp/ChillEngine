@@ -169,7 +169,28 @@ namespace Editor.Components
 
         private readonly ObservableCollection<IMSComponent> _components = new ObservableCollection<IMSComponent>();
         public ReadOnlyObservableCollection<IMSComponent> Components { get; }
+
+        public T GetMSComponent<T>() where T : IMSComponent
+        {
+            return (T)Components.FirstOrDefault(x => x.GetType() == typeof(T));
+        }
         public List<GameEntity> SelectedEnties { get; }
+        private void MakeComponentList()
+        {
+            _components.Clear();
+            var firstEntity = SelectedEnties.First();
+            if (firstEntity == null) return;
+            foreach (var component in firstEntity.Components)
+            {
+                var type = component.GetType();
+                if (!SelectedEnties.Skip(1).Any(entity => entity.GetComponent(type) == null))
+                {
+                    Debug.Assert(Components.FirstOrDefault(x => x.GetType() == type) == null);
+                    _components.Add(component.GetMultiSelectionComponent(this));
+                }
+            }
+        }
+        
 
         public MSEntity(List<GameEntity>gameEntities)
         {
@@ -210,8 +231,10 @@ namespace Editor.Components
         {
             _enableUpdates = false;
             UpdateMSGameEntity();
+            MakeComponentList();
             _enableUpdates = true;
         }
+        
 
         protected virtual bool UpdateGameEntities(string propertyName)
         {

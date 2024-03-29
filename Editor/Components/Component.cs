@@ -13,6 +13,8 @@ namespace Editor.Components
     [DataContract]
     abstract class Component : ViewModeBase
     {
+        public abstract IMSComponent GetMultiSelectionComponent(MSEntity msEntity);
+        
         [DataMember]
         public GameEntity Owner { get; private set; }
 

@@ -57,6 +57,8 @@ namespace Editor.Components
         {
             
         }
+
+         public override IMSComponent GetMultiSelectionComponent(MSEntity msEntity) => new MSTransform(msEntity);
     }
 
     sealed class MSTransform : MSComponent<Transform>

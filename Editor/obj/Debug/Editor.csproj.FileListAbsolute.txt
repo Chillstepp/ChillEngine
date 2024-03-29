@@ -88,3 +88,7 @@ E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\WorldEditorVie
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\LoggerView.baml
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\Utilities\UndoRedoView.baml
 E:\ChillEngine\Editor\obj\Debug\Dictionaries\EditorColors.baml
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.g.cs
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.baml
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.g.cs
+E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.baml

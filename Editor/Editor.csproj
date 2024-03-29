@@ -67,11 +67,17 @@
     <Compile Include="GameProject\OpenProject.cs" />
     <Compile Include="GameProject\Project.cs" />
     <Compile Include="GameProject\Scene.cs" />
+    <Compile Include="SubEditor\WorldEditor\ComponentView.xaml.cs">
+      <DependentUpon>ComponentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SubEditor\WorldEditor\GameEntityView.xaml.cs">
       <DependentUpon>GameEntityView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SubEditor\WorldEditor\ProjectLayoutView.xaml.cs">
       <DependentUpon>ProjectLayoutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SubEditor\WorldEditor\TransformView.xaml.cs">
+      <DependentUpon>TransformView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SubEditor\WorldEditor\WorldEditorView.xaml.cs">
       <DependentUpon>WorldEditorView.xaml</DependentUpon>
@@ -117,8 +123,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SubEditor\WorldEditor\ComponentView.xaml" />
     <Page Include="SubEditor\WorldEditor\GameEntityView.xaml" />
     <Page Include="SubEditor\WorldEditor\ProjectLayoutView.xaml" />
+    <Page Include="SubEditor\WorldEditor\TransformView.xaml" />
     <Page Include="SubEditor\WorldEditor\WorldEditorView.xaml" />
     <Page Include="Utilities\LoggerView.xaml" />
     <Page Include="Utilities\UndoRedoView.xaml" />

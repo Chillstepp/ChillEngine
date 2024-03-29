@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using Editor.Components;
-using PrimalEditor.EngineAPIStructs;
+using Editor.EngineAPIStructs;
 
-namespace PrimalEditor.EngineAPIStructs
+namespace Editor.EngineAPIStructs
 {
     [StructLayout(LayoutKind.Sequential)]
     class transformComponent
