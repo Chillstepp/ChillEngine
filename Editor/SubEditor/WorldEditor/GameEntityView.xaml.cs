@@ -52,6 +52,7 @@ namespace Editor.SubEditor
         
         private void OnName_TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            _propertyName = string.Empty;
             _undoAction = GetRenameAction();
         }
 

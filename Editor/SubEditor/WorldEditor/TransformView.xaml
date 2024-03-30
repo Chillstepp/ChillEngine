@@ -27,15 +27,21 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Position" Grid.Column="0" Grid.Row="0"></TextBlock>
             <utl:VectorBox X="{Binding PosX}" Y="{Binding PosY}" Z="{Binding PosZ}" Grid.Column="1" Grid.Row="0"
-                           PreviewMouseLeftButtonDown="OnPosition_VectorBox_Mouse_LBD"
-                           PreviewMouseLeftButtonUp="OnPosition_VectorBox_Mouse_LBU"
-                           LostKeyboardFocus="OnPosition_VectorBox_LostKeyBoardFocus"></utl:VectorBox>
+                           PreviewMouseLeftButtonDown="OnPosition_VectorBox_PreviewMouse_LBD"
+                           PreviewMouseLeftButtonUp="OnPosition_VectorBox_PreviewMouse_LBU"
+                           LostKeyboardFocus="OnPosition_VectorBox_LostKeyboardFocus"></utl:VectorBox>
             
             <TextBlock Text="Rotation" Grid.Column="0" Grid.Row="1"></TextBlock>
-            <utl:VectorBox X="{Binding RotX}" Y="{Binding RotY}" Z="{Binding RotZ}" Grid.Column="1" Grid.Row="1"></utl:VectorBox>
+            <utl:VectorBox X="{Binding RotX}" Y="{Binding RotY}" Z="{Binding RotZ}" Grid.Column="1" Grid.Row="1"
+                           PreviewMouseLeftButtonDown="OnRotation_VectorBox_PreviewMouse_LBD"
+                           PreviewMouseLeftButtonUp="OnRotation_VectorBox_PreviewMouse_LBU"
+                           LostKeyboardFocus="OnRotation_VectorBox_LostKeyboardFocus"></utl:VectorBox>
             
             <TextBlock Text="Scale" Grid.Column="0" Grid.Row="2"></TextBlock>
-            <utl:VectorBox X="{Binding ScaleX}" Y="{Binding ScaleY}" Z="{Binding ScaleZ}" Grid.Column="1" Grid.Row="2"></utl:VectorBox>
+            <utl:VectorBox X="{Binding ScaleX}" Y="{Binding ScaleY}" Z="{Binding ScaleZ}" Grid.Column="1" Grid.Row="2"
+                           PreviewMouseLeftButtonDown="OnScale_VectorBox_PreviewMouse_LBD"
+                           PreviewMouseLeftButtonUp="OnScale_VectorBox_PreviewMouse_LBU"
+                           LostKeyboardFocus="OnScale_VectorBox_LostKeyboardFocus"></utl:VectorBox>
         </Grid>
     </local:ComponentView>
 </UserControl>

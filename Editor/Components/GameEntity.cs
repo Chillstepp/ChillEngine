@@ -45,7 +45,7 @@ namespace Editor.Components
                         EntityId = EngineAPI.CreateGameEntity(this);
                         Debug.Assert(ID.IsValid(_entityId));
                     }
-                    else
+                    else if(ID.IsValid(EntityId))
                     {
                         EngineAPI.RemoveGameEntity(this);
                     }

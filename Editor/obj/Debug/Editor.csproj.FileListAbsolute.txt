@@ -92,3 +92,7 @@ E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.g.cs
 E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.baml
 E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.g.cs
 E:\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.baml
