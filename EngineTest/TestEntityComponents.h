@@ -46,7 +46,7 @@ private:
         while(count > 0)
         {
             ++added;
-            game_entity::entity entity = game_entity::create_game_entity(entity_info);
+            game_entity::entity entity = game_entity::create(entity_info);
             assert(entity.is_valid());
             entities.push_back(entity);
             --count;
@@ -63,9 +63,9 @@ private:
             assert(entity.is_valid());
             if(entity.is_valid())
             {
-                game_entity::remove_game_entity(entity);
+                game_entity::remove(entity.get_id());
                 entities.erase(entities.begin() + index);
-                assert(!game_entity::is_alive(entity));
+                assert(!game_entity::is_alive(entity.get_id()));
                 ++removed;
             }
             --count;

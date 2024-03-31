@@ -10,7 +10,7 @@ namespace ChillEngine::transform
         f32 rotation[4] = {};
         f32 scale[3] = {1.0f, 1.0f, 1.0f};
     };
-    component create_transform(const init_info& info, game_entity::entity entity);
-    void remove_transform(component c);
+    component create(init_info info, game_entity::entity entity);
+    void remove(component c);
     
 }

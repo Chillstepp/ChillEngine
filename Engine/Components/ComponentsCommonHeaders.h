@@ -5,3 +5,4 @@
 #include "../Utilities/Utilities.h"
 #include "../EngineAPI/GameEntity.h"
 #include "../EngineAPI/TransformComponent.h"
+#include "../EngineAPI/ScriptComponent.h"
