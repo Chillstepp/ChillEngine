@@ -8,7 +8,7 @@ The engine contains four basic modules.
 - Engine — Carrying the core logic of rendering and game architecture.
 - EngineDLL — Exposed Engine API to Editor.
 - EngineTest — Test Engine features like rendering, game architecture, etc.
-- GameCode/GameProject — Gameplay logic.
+- GameCode/GameProject(Generate by editor) — Gameplay logic.
 
 <img src="https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240331144724543.png" alt="image-20240331144724543" style="zoom:67%;" />
 
@@ -20,7 +20,7 @@ The engine contains four basic modules.
 - Generate game Solution/Project
   - After the engine creates the project, generates the game code directory framework, generates .sln/.vcxproj, and sets the engine path environment variable.
 
-- 
+- New Script in Editor and generate related code in solution.
 
 ## Gameplay Arch
 
