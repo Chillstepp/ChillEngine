@@ -27,7 +27,7 @@ namespace Editor.GameProject
         public string IconFilePath { get; set; }
         public string ScreenshotFilePath { get; set; }
         public string ProjectFilePath { get; set; }
-
+        public string TemplatePath { get; set; }
     }
     
     public class CreateProject : ViewModeBase
@@ -162,6 +162,11 @@ namespace Editor.GameProject
                 var projectnamedotprimal_path =
                     Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projectnamedotprimal_path, projectXml);
+                
+                //Create MSVC Solution
+                CreateMSVCSolution(template, path);
+
+
                 return path;
             }
             catch (Exception e)
@@ -171,6 +176,31 @@ namespace Editor.GameProject
                 return string.Empty;
             }
         }
+
+        private void CreateMSVCSolution(ProjectTemplate template, string projectPath)
+        {
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCSolution")));
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCProject")));
+
+            var EngineAPIPath = Path.Combine(MainWindow.ChillEnginePath, @"Engine\EngineAPI\");
+            Debug.Assert(Directory.Exists(EngineAPIPath));
+
+            var _0 = ProjectName;
+            var _1 = "{" + Guid.NewGuid().ToString().ToUpper() + "}";
+            var _2 = EngineAPIPath;
+            var _3 = MainWindow.ChillEnginePath;
+            
+            var solution = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCSolution"));
+            solution = String.Format(solution, _0, _1, "{" + Guid.NewGuid().ToString().ToUpper() + "}");
+            File.WriteAllText(Path.GetFullPath(Path.Combine(projectPath, $"{_0}.sln")), solution);
+            
+            var project = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCSolution"));
+            project = String.Format(project, _0, _1, _2, _3);
+            File.WriteAllText(Path.GetFullPath(Path.Combine(projectPath, $@"GameCode\{_0}.vcxproj")), project);
+            
+
+        }
+
         public CreateProject()
         {
             ProjectTemplates = new ReadOnlyObservableCollection<ProjectTemplate>(_projectTemplates);
@@ -186,6 +216,7 @@ namespace Editor.GameProject
                     template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "Screenshot.png"));
                     template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
                     template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), template.ProjectFile));
+                    template.TemplatePath = Path.GetDirectoryName(file);
                     
                     _projectTemplates.Add(template);
                 }

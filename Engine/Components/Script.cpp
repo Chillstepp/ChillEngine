@@ -12,11 +12,11 @@ namespace ChillEngine::script
         utl::vector<id::generation_type> generations;
         utl::vector<script_id> free_ids;
 
-        using script_registery = std::unordered_map<size_t, detail::script_creator>;
+        using script_registry = std::unordered_map<size_t, detail::script_creator>;
         //这样可以使得accessing永远晚于initialize.
-        script_registery& registery()
+        script_registry& registery()
         {
-            static script_registery reg;
+            static script_registry reg;
             return reg;
         }
 
@@ -38,7 +38,7 @@ namespace ChillEngine::script
     {
         u8 register_script(size_t tag, script_creator func)
         {
-            bool result(registery().insert(script_registery::value_type{tag, func}).second);
+            bool result(registery().insert(script_registry::value_type{tag, func}).second);
             assert(result);
             return result;
         }
@@ -64,9 +64,9 @@ namespace ChillEngine::script
             generations.push_back(0);
         }
         assert(id::is_valid(id));
+        const id::id_type index{(id::id_type)entity_scripts.size()};
         entity_scripts.emplace_back(info.script_creator(entity));
         assert(entity_scripts.back()->get_id() == entity.get_id());
-        const id::id_type index{(id::id_type)entity_scripts.size()};
         id_mapping[id::index(id)] = index;
         return component{id};
     }

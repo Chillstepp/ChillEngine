@@ -96,3 +96,5 @@ E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.g.cs
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.baml
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.baml
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\EnginePathDialog.g.cs
+E:\ChillEngine\ChillEngine\Editor\obj\Debug\EnginePathDialog.baml
