@@ -23,7 +23,7 @@ namespace Editor
             {
                 MessageTextBlock.Text = "Invalid char(s) in path.";
             }
-            else if (!Directory.Exists(Path.Combine(path, @"Engine\EngineAPI"))) ;
+            else if (!Directory.Exists(Path.Combine(path, @"Engine\EngineAPI")))
             {
                 MessageTextBlock.Text = "Unable to find ChillEngine at specific path.";
             }

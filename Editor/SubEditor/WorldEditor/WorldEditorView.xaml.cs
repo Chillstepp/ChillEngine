@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using Editor.GameDev;
 using Editor.GameProject;
 
 namespace Editor.SubEditor
@@ -19,6 +20,12 @@ namespace Editor.SubEditor
             Focus();
             //sometimes may lost focus, so focus again when UndoList change
             // ((INotifyCollectionChanged)Project.UndoRedo.UndoList).CollectionChanged += (s, e) => Focus();
+        }
+
+        private void OnNewScript_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new NewScriptDialog();
+            dlg.ShowDialog();
         }
     }
 }

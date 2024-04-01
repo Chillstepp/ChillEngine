@@ -50,7 +50,9 @@ id::id_type CreateGameEntity(game_entity_descriptor* e)
     assert(e);
     game_entity_descriptor& desc = *e;
     transform::init_info transform_info = desc.transform.to_init_info();
-    game_entity::entity_info entity_info(&transform_info);
+    game_entity::entity_info entity_info(
+        &transform_info
+    );
     return game_entity::create(entity_info).get_id();
 }
 

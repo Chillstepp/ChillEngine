@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Editor.Utilities;
@@ -97,5 +99,48 @@ namespace Editor.GameDev
             _vsInstance?.Quit();
         }
 
+        public static bool AddFilesToSolution(string solution, string projectName, string[] files)
+        {
+            Debug.Assert(files?.Length > 0);
+            OpenVisualStudio(solution);
+
+            try
+            {
+                if (_vsInstance != null)
+                {
+                    if(!_vsInstance.Solution.IsOpen) _vsInstance.Solution.Open(solution);
+                    else _vsInstance.ExecuteCommand("File.SaveAll");
+
+                    foreach (EnvDTE.Project project in _vsInstance.Solution.Projects)
+                    {
+                        if (project.UniqueName.Contains(projectName))
+                        {
+                            foreach (var file in files)
+                            {
+                                project.ProjectItems.AddFromFile(file);
+                            }
+                        }
+                    }
+
+                    var cpp = files.FirstOrDefault(x => Path.GetExtension(x) == ".cpp");
+                    // var h = files.FirstOrDefault(x => Path.GetExtension(x) == ".h");
+                    if (!string.IsNullOrEmpty(cpp))
+                    {
+                        _vsInstance.ItemOperations.OpenFile(cpp, EnvDTE.Constants.vsViewKindTextView).Visible = true;
+                    }
+                    _vsInstance.MainWindow.Activate();
+                    _vsInstance.MainWindow.Visible = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine("Failed to add files to project");
+                Logger.Log(MessageType.Error, "Failed to add files to project");
+                return false;
+            }
+
+            return true;
+        }
     }
 }

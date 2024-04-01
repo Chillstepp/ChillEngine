@@ -5,17 +5,58 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
-using Editor.GameProject;
+using System.Windows.Media.Animation;
 using Editor.Utilities;
+using EnvDTE;
+using Project = Editor.GameProject.Project;
+using Window = System.Windows.Window;
 
 namespace Editor.GameDev
 {
     public partial class NewScriptDialog : Window
     {
+        private static readonly string _cppCode = 
+@"#include ""{0}.h""
+namespace {1} {{
+REGISTER_SCRIPT({0});
+void {0}::begin_play()
+{{
+}}
+void {0}::update(float dt)
+{{
+}}
+}} // namespace {1}";
+
+        private static readonly string _hCode = 
+@"#pragma once
+namespace {1} {{
+class {0} : public ChillEngine::script::entity_script
+{{
+public:
+    constexpr explicit {0}(ChillEngine::game_entity::entity entity)
+        : ChillEngine::script::entity_script{{entity}} {{}}
+    void begin_play() override;
+    void update(float dt) override;
+private:
+}};
+}} // namespace {1}";
+
+        private static readonly string _namespace = GetNamespaceFromProjectName();
+
+        private static string GetNamespaceFromProjectName()
+        {
+            var projectName = Project.Current.Name;
+            projectName = projectName.Replace(' ', '_');
+            return projectName;
+        }
+        
         public NewScriptDialog()
         {
             InitializeComponent();
+            Owner = Application.Current.MainWindow;
+            ScriptPath.Text = @"GameCode\";
         }
         
         bool Validate()
@@ -70,25 +111,77 @@ namespace Editor.GameDev
         private async void OnOk_Button_Click(object sender, RoutedEventArgs e)
         {
             if(!Validate()) return;
+            //等待, 禁用交互
             IsEnabled = false;
-
+            BusyAnimation.Opacity = 0;
+            BusyAnimation.Visibility = Visibility.Visible;
+            DoubleAnimation fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(500)));
+            BusyAnimation.BeginAnimation(OpacityProperty, fadeIn);
             try
             {
-                await Task.Run(() =>CreateScript(, ));
+                var name = ScriptName.Text.Trim();
+                var path = Path.GetFullPath(Path.Combine(Project.Current.Path, ScriptPath.Text.Trim()));
+                var solution = Project.Current.Solution;
+                var projectName = Project.Current.Name;
+                await Task.Run(() =>CreateScript(name, path, solution, projectName));
             }
             catch (Exception exception)
             {
                 Debug.WriteLine(exception);
                 Logger.Log(MessageType.Error, $"Failed to create script {ScriptName.Text}");
             }
+            finally
+            {
+                DoubleAnimation fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(200)));
+                fadeOut.Completed += (s, e) =>
+                {
+                    BusyAnimation.Opacity = 0;
+                    BusyAnimation.Visibility = Visibility.Hidden;
+                    Close();
+                };
+                BusyAnimation.BeginAnimation(OpacityProperty, fadeOut);
+            }
+        }
+
+        private void CreateScript(string name, string path, string solution, string projectName)
+        {
+            
+            if(!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+            var cpp = Path.GetFullPath(Path.Combine(path, $"{name}.cpp"));
+            var h = Path.GetFullPath(Path.Combine(path, $"{name}.h"));
+            using (var sw = File.CreateText(cpp))
+            {
+                sw.Write(string.Format(_cppCode, name, _namespace));
+            }
+
+            using (var sw = File.CreateText(h))
+            {
+                sw.Write(string.Format(_hCode, name, _namespace));
+            }
+
+            string[] files = new string[] {cpp, h};
+            
+            //Here we try three times...
+            for (int i = 0; i < 3; i++)
+            {
+                if (!VisualStudio.AddFilesToSolution(solution, projectName, files))
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+                else break;
+            }
+
+
         }
 
         private void OnScriptName_TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if(!Validate()) return;
             var name = ScriptName.Text.Trim();
-            var project = Project.Current;
-            MessageTextBlock.Text = $"{name}.h and {name}.cpp will added to {Path.Combine(Project.Current.Path, @"GameCode\")}";
+
+            MessageTextBlock.Text = $"{name}.h and {name}.cpp will added to {Path.Combine(Path.Combine(Project.Current.Path, Project.Current.Name), @"GameCode\")}";
+
         }
 
         private void OnScriptPath_TextBox_TextChanged(object sender, TextChangedEventArgs e)
