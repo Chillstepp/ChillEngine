@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Editor.Utilities;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using Editor.Utilities;
-using EnvDTE80;
 
 namespace Editor.GameDev
 {

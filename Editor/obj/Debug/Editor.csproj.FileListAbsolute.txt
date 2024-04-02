@@ -98,10 +98,8 @@ E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\ComponentView.
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\SubEditor\WorldEditor\TransformView.baml
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\EnginePathDialog.g.cs
 E:\ChillEngine\ChillEngine\Editor\obj\Debug\EnginePathDialog.baml
-E:\ChillEngine\Editor\obj\Debug\Interop.EnvDTE.dll
-E:\ChillEngine\Editor\obj\Debug\Interop.EnvDTE80.dll
-E:\ChillEngine\Editor\obj\Debug\Editor.csproj.ResolveComReference.cache
 E:\ChillEngine\Editor\obj\Debug\EnginePathDialog.g.cs
 E:\ChillEngine\Editor\obj\Debug\GameDev\NewScriptDialog.g.cs
 E:\ChillEngine\Editor\obj\Debug\EnginePathDialog.baml
 E:\ChillEngine\Editor\obj\Debug\GameDev\NewScriptDialog.baml
+E:\ChillEngine\Editor\obj\Debug\Editor.csproj.CopyComplete

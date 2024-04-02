@@ -72,7 +72,7 @@ namespace ChillEngine::id
         };                                                              \
 
 #else
-    #define DEFINE_TYPED_ID(name) using name = id::id_type;
+    #define DEFINE_TYPE_ID(name) using name = id::id_type;
 #endif
     
     
