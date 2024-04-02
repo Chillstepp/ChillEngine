@@ -6,8 +6,13 @@
              xmlns:local="clr-namespace:Editor.SubEditor"
              xmlns:utilities="clr-namespace:Editor.Utilities"
              xmlns:ctlr="clr-namespace:Editor.Utilities.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Focusable="True"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
+    </UserControl.Resources>
     <UserControl.InputBindings>
         <!-- HotKey Binding -->
         <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl" ></KeyBinding>
@@ -22,7 +27,13 @@
         <StackPanel Orientation="Horizontal">
             <Button Content="Undo" Command="{Binding UndoCommand}"/>
             <Button Content="Redo" Command="{Binding RedoCommand}" Margin="32,0,0,0"/>
-            <Button Content="NewScript" Click="OnNewScript_Button_Click"></Button>
+            <Button Content="NewScript" Click="OnNewScript_Button_Click" Margin="5,0,0,0"></Button>
+            <Button Content="Build" x:Name="BuildButton" Margin="5,0,0,0" Command="{Binding BuildCommand}"></Button>
+            <ComboBox x:Name="RunConfig" VerticalAlignment="Center" Margin="3,0" Width="72"
+                      SelectedIndex="{Binding BuildConfig}">
+                <ComboBoxItem Content="Debug"/>
+                <ComboBoxItem Content="Release"/>
+            </ComboBox>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

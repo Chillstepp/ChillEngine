@@ -1,3 +1,5 @@
-﻿  pch.cpp
-  Engine.cpp
-  Engine.vcxproj -> E:\Engine\ChillEngine\x64\Debug\Engine.lib
+﻿  Entity.cpp
+  Script.cpp
+  Transform.cpp
+  Main.cpp
+  Engine.vcxproj -> E:\ChillEngine\x64\Debug\Engine.lib

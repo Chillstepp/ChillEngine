@@ -12,6 +12,14 @@ using Editor.Utilities;
 
 namespace Editor.GameProject
 {
+    enum BuildConfiguration
+    {
+        Debug,
+        DebugEditor,
+        Release,
+        ReleaseEditor
+    }
+    
     [DataContract(Name = "Game")]
     class Project : ViewModeBase
     {
@@ -25,7 +33,61 @@ namespace Editor.GameProject
         public string FullPath => $@"{Path}{Name}{Extension}";
         
         public string Solution => $@"{Path}{Name}.sln";
+
+        private static readonly string[] _buildConfigurationNames = new String[] {"Debug", "DebugEditor", "Release", "ReleaseEditor" };
+
+        private int _buildConfig;
+        [DataMember]
+        public int BuildConfig
+        {
+            get => _buildConfig;
+            set
+            {
+                if (_buildConfig != value)
+                {
+                    _buildConfig = value;
+                    OnPropertyChanged(nameof(BuildConfig));
+                }
+            }
+        }
+
+        public BuildConfiguration StandaloneBuildConfiguration =>
+            BuildConfig == 0 ? BuildConfiguration.Debug : BuildConfiguration.Release;
+
+        public BuildConfiguration DllBuildConfiguration =>
+            BuildConfig == 0 ? BuildConfiguration.DebugEditor : BuildConfiguration.ReleaseEditor;
+        private static string GetConfigurationName(BuildConfiguration config) => _buildConfigurationNames[(int)config];
         
+        private void BuildGameCodeDll(bool showWindow = true)
+        {
+            try
+            {
+                UnLoadGameCodeDll();
+                VisualStudio.BuildSolution(this, GetConfigurationName(DllBuildConfiguration), showWindow);
+                if (VisualStudio.BuildSucceded)
+                {
+                    LoadGameCodeDll();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw;
+            }
+
+        }
+
+        private void LoadGameCodeDll()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UnLoadGameCodeDll()
+        {
+            throw new NotImplementedException();
+        }
+
+
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new ObservableCollection<Scene>();
         
@@ -48,12 +110,10 @@ namespace Editor.GameProject
 
         public ICommand AddSceneCommand { get; private set; }
         public ICommand RemoveSceneCommand { get; private set; }
-        
         public ICommand UndoCommand { get; private set; }
-        
         public ICommand RedoCommand { get; private set; }
-        
         public ICommand SaveCommand { get; private set; }
+        public ICommand BuildCommand { get; private set; }
         
         private void AddSceneInternal(string sceneName)
         {
@@ -122,11 +182,12 @@ namespace Editor.GameProject
                     $"Remove {x.Name}"));
             }, x => !x.IsActive);
 
-            UndoCommand = new RelayCommand<object>(x => UndoRedo.Undo());
-            RedoCommand = new RelayCommand<object>(x => UndoRedo.Redo());
+            UndoCommand = new RelayCommand<object>(x => UndoRedo.Undo(), x => UndoRedo.RedoList.Any());
+            RedoCommand = new RelayCommand<object>(x => UndoRedo.Redo(), x => UndoRedo.UndoList.Any());
             SaveCommand = new RelayCommand<object>(x => Save(this));
+            BuildCommand = new RelayCommand<object>(x => BuildGameCodeDll(), x => !VisualStudio.IsDebugging() && VisualStudio.BuildDone);
         }
-
+        
         public Project(string name, string path)
         {
             Name = name;

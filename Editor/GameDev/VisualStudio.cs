@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using Editor.GameProject;
+using EXCEPINFO = System.Runtime.InteropServices.ComTypes.EXCEPINFO;
 
 namespace Editor.GameDev
 {
@@ -12,6 +14,8 @@ namespace Editor.GameDev
     {
         private static EnvDTE80.DTE2 _vsInstance = null;
         private static readonly string _progID = "VisualStudio.DTE.17.0";
+        public static bool BuildSucceded { get; private set; } = true;
+        public static bool BuildDone { get; private set; } = true;
 
         [DllImport("ole32.dll")]
         private static extern int CreateBindCtx(uint reserved, out IBindCtx ppbc);
@@ -140,6 +144,81 @@ namespace Editor.GameDev
             }
 
             return true;
+        }
+
+        public static void BuildSolution(Project project, string configName, bool showWindow = true)
+        {
+            if (IsDebugging())
+            {
+                Logger.Log(MessageType.Error, "Visual studio is current running a process.");
+                return;
+            }
+            OpenVisualStudio(project.Solution);
+            BuildSucceded = false;
+            BuildDone = false;
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    if (!_vsInstance.Solution.IsOpen) _vsInstance.Solution.Open(project.Solution);
+                    _vsInstance.MainWindow.Visible = showWindow;
+                    _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildSolutionBegin;
+                    _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildSolutionDone;
+                    _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
+                    _vsInstance.ExecuteCommand("Build.BuildSolution");
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine($"Attempt {i}: failed to build {project.Name}");
+                    System.Threading.Thread.Sleep(1000);
+                }
+            }
+
+        }
+
+        private static void OnBuildSolutionDone(string project, string projectconfig, string platform, string solutionconfig, bool success)
+        {
+            if (BuildDone) return;
+            if (success)
+            {
+                Logger.Log(MessageType.Info, $"Building {projectconfig} configuration succeed");
+            }
+            else
+            {
+                Logger.Log(MessageType.Error, $"Building {projectconfig} configuration failed");
+            }
+
+            BuildDone = true;
+            BuildSucceded = success;
+        }
+
+        private static void OnBuildSolutionBegin(string project, string projectconfig, string platform, string solutionconfig)
+        {
+            Logger.Log(MessageType.Info, $"Building {project}, {projectconfig}, {platform}, {solutionconfig}");
+        }
+
+        public static bool IsDebugging()
+        {
+            bool result = false;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                try
+                {
+                    result = _vsInstance != null &&
+                             (_vsInstance.Debugger.CurrentProgram != null ||
+                              _vsInstance.Debugger.CurrentMode == EnvDTE.dbgDebugMode.dbgRunMode);
+                    
+                }
+                catch (Exception e)
+                {
+                    Debug.Write(e.Message);
+                    if (!result) System.Threading.Thread.Sleep(1000);
+                }
+            }
+
+            return result;
         }
     }
 }
