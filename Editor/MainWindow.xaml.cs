@@ -20,7 +20,7 @@ namespace Editor
         }
 
         //@todo: in dev.
-        public static string ChillEnginePath { get; set; } = @"E:\ChillEngine\ChillEngine";
+        public static string ChillEnginePath { get; set; }
 
         private void GetEnginePath()
         {

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Editor.Components;
 using Editor.EngineAPIStructs;
@@ -24,34 +25,43 @@ namespace Editor.DLLWrapper
 {
     static class EngineAPI
     {
-        private const string _dllName = "EngineDll.dll";
+        private const string _engineDll = "EngineDll.dll";
 
-        //EngineAPI.cpp method: EDITOR_INTERFACE id::id_type CreateGameEntity(game_entity_descriptor* e)
-        [DllImport(_dllName)]
-        private static extern int CreateGameEntity(GameEntityDescriptor desc);
+        [DllImport(_engineDll, CharSet = CharSet.Ansi)]
+        public static extern int LoadGameCodeDll(string dllpath);
 
-        public static int CreateGameEntity(GameEntity entity)
+        [DllImport(_engineDll)]
+        public static extern int UnloadGameCodeDll();
+        internal static class EntityAPI
         {
-            GameEntityDescriptor desc = new GameEntityDescriptor();
-            
-            //transform component
+            //EngineAPI.cpp method: EDITOR_INTERFACE id::id_type CreateGameEntity(game_entity_descriptor* e)
+            [DllImport(_engineDll)]
+            private static extern int CreateGameEntity(GameEntityDescriptor desc);
+
+            public static int CreateGameEntity(GameEntity entity)
             {
-                var c = entity.GetComponent<Transform>();
-                desc.Transform.Position = c.Position;
-                desc.Transform.Rotation = c.Rotation;
-                desc.Transform.Scale = c.Scale;
+                GameEntityDescriptor desc = new GameEntityDescriptor();
+
+                //transform component
+                {
+                    var c = entity.GetComponent<Transform>();
+                    desc.Transform.Position = c.Position;
+                    desc.Transform.Rotation = c.Rotation;
+                    desc.Transform.Scale = c.Scale;
+                }
+
+                return CreateGameEntity(desc);
             }
 
-            return CreateGameEntity(desc);
-        }
+            //EngineAPI.cpp method: EDITOR_INTERFACE void RemoveGameEntity(id::id_type id)
+            [DllImport(_engineDll)]
+            private static extern void RemoveGameEntity(int id);
 
-        //EngineAPI.cpp method: EDITOR_INTERFACE void RemoveGameEntity(id::id_type id)
-        [DllImport(_dllName)]
-        private static extern void RemoveGameEntity(int id);
-
-        public static void RemoveGameEntity(GameEntity entity)
-        {
-            RemoveGameEntity(entity.EntityId);
+            public static void RemoveGameEntity(GameEntity entity)
+            {
+                RemoveGameEntity(entity.EntityId);
+            }
         }
+        
     }
 }

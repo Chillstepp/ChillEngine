@@ -12,15 +12,24 @@ The engine contains four basic modules.
 
 <img src="https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240331144724543.png" alt="image-20240331144724543" style="zoom:67%;" />
 
+## Build Related
+
+- Only support Windows now. (Cross platform is in planning).
+- Engine/GameProject has four Configuration: Debug, DebugEditor, Release, ReleaseEditor:
+  - DebugEditor/ReleaseEditor ouputs DLL,which will be used for editor
+  - Debug/Release output exe.
+
+# Engine Features
+
 ## Editor
 
 - XML Serialization
 - Undo/Redo Pattern
 - Logger & Filtered log viewer
-- Generate game Solution/Project
+- Generate game Solution/Project by [EnvDTE(Visual Studio automation)](https://learn.microsoft.com/en-us/dotnet/api/envdte.dte?view=visualstudiosdk-2022) ,and Rider automation is WIP.
   - After the engine creates the project, generates the game code directory framework, generates .sln/.vcxproj, and sets the engine path environment variable.
-
-- New Script in Editor and generate related code in solution.
+  - Generate script code after create Script in editor.
+  - Build Game Code in editor.
 
 ## Gameplay Arch
 
@@ -30,4 +39,5 @@ The engine contains four basic modules.
 
 ## Rendering Feature
 
-RHI: DX12
+- RHI: DX12(WIP), Vulkan(Planning)
+- 

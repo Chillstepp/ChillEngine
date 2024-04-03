@@ -53,19 +53,21 @@ namespace Editor.GameDev
                             string name = String.Empty;
                             currentMoniker[0].GetDisplayName(bindCtx, null, out name);
                             if (name.Contains(_progID))
-                            {
-                                hResult = rot.GetObject(currentMoniker[0], out object obj);
-                                if (hResult < 0 || bindCtx == null)
-                                    throw new COMException(
-                                        $"running object table's GetObject() returned HResult:{hResult:x8}");
-                                EnvDTE80.DTE2 dte = obj as EnvDTE80.DTE2;
-                                var solutionName = dte.Solution.FullName;
-                                if (solutionName == solutionPath)
-                                {
-                                    _vsInstance = dte;
-                                    break;
-                                }
+                            { 
+                            //     hResult = rot.GetObject(currentMoniker[0], out object obj);
+                            //     if (hResult < 0 || bindCtx == null)
+                            //         throw new COMException(
+                            //             $"running object table's GetObject() returned HResult:{hResult:x8}");
+                            //     EnvDTE80.DTE2 dte = obj as EnvDTE80.DTE2;
+                            //     var solutionName = dte.Solution.FullName;
+                            //     if (solutionName == solutionPath)
+                            //     {
+                            //         _vsInstance = dte;
+                            //         break;
+                            //     }
+                                break;
                             }
+                            
                         }
 
                         if (_vsInstance == null)
@@ -156,14 +158,53 @@ namespace Editor.GameDev
             OpenVisualStudio(project.Solution);
             BuildSucceded = false;
             BuildDone = false;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 1; i++)
             {
                 try
                 {
-                    if (!_vsInstance.Solution.IsOpen) _vsInstance.Solution.Open(project.Solution);
+                    if (!_vsInstance.Solution.IsOpen)
+                    {
+                        bool openFinished = false;
+                        do
+                        {
+                            try
+                            {
+                                //@todo: fk it, I don't know why this need to sleep awhile, otherwise it will open solution infinite,
+                                //i doubt that create instance cause this. I will figure out it later.
+                                System.Threading.Thread.Sleep(5000);
+                                Debug.WriteLine("whysb3");
+                                _vsInstance.Solution.Open(project.Solution);
+                                Debug.WriteLine("whysb");
+                                openFinished = true;
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("whysb2");
+                                Debug.WriteLine(e.Message);
+                            }
+                            Debug.WriteLine("whysb4");
+                            
+                        } while (!openFinished);
+                        
+                    }
                     _vsInstance.MainWindow.Visible = showWindow;
                     _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildSolutionBegin;
                     _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildSolutionDone;
+                    
+                    //delete pbd file
+                    try
+                    {
+                        foreach (var pbdFile in Directory.GetFiles(Path.Combine($"{project.Path}", $@"x64\{configName}"), "*.pbd"))
+                        {
+                            File.Delete(pbdFile);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
+
+                    
                     _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
                     _vsInstance.ExecuteCommand("Build.BuildSolution");
                 }

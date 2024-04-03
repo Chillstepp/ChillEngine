@@ -51,3 +51,6 @@ E:\ChillEngine\Editor\obj\x64\Debug\Editor.csproj.CoreCompileInputs.cache
 E:\ChillEngine\Editor\obj\x64\Debug\Editor.csproj.CopyComplete
 E:\ChillEngine\Editor\obj\x64\Debug\Editor.exe
 E:\ChillEngine\Editor\obj\x64\Debug\Editor.pdb
+E:\ChillEngine\x64\Debug\Editor.exe.config
+E:\ChillEngine\x64\Debug\Editor.exe
+E:\ChillEngine\x64\Debug\Editor.pdb

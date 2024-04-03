@@ -59,7 +59,7 @@ private:
             ScriptPath.Text = @"GameCode\";
         }
         
-        bool Validate()
+        private bool Validate()
         {
             bool isValid = false;
             var name = ScriptName.Text.Trim();
