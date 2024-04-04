@@ -30,7 +30,7 @@
             <Button Content="Redo" Command="{Binding RedoCommand}" Margin="32,0,0,0"/>
             <Button Content="NewScript" Click="OnNewScript_Button_Click" Margin="5,0,0,0"
                     IsEnabled="{Binding Path=IsEnabled, ElementName=BuildButton}"></Button>
-            <Button Content="Build" x:Name="BuildButton" Margin="5,0,0,0" Command="{Binding BuildCommand}"></Button>
+            <Button Content="Build" x:Name="BuildButton" Margin="5,0,0,0" Command="{Binding BuildCommand}" CommandParameter="{StaticResource True}"></Button>
             <ComboBox x:Name="RunConfig" VerticalAlignment="Center" Margin="3,0" Width="72"
                       SelectedIndex="{Binding BuildConfig}">
                 <ComboBoxItem Content="Debug"/>
