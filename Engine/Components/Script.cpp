@@ -19,6 +19,14 @@ namespace ChillEngine::script
             static script_registry reg;
             return reg;
         }
+#ifdef USE_WITH_EDITOR
+        utl::vector<std::string>& script_names()
+        {
+            static utl::vector<std::string> names;
+            return names;
+        }
+#endif
+        
 
         bool exists(script_id id)
         {
@@ -42,6 +50,20 @@ namespace ChillEngine::script
             assert(result);
             return result;
         }
+        script_creator get_script_creator(size_t tag)
+        {
+            auto script = ChillEngine::script::registery().find(tag);
+            assert(script != ChillEngine::script::registery().end());
+            return script->second;
+        }
+#ifdef USE_WITH_EDITOR
+        u8 add_script_name(const char* name)
+        {
+            script_names().push_back(name);
+            return true;
+        }
+#endif
+        
     }
     
     component script::create(init_info info, game_entity::entity entity)
@@ -83,3 +105,21 @@ namespace ChillEngine::script
 
     }
 }
+
+
+//Export for editor use
+#if USE_WITH_EDITOR
+#include <atlsafe.h>
+EXTERN_C __declspec(dllexport)
+LPSAFEARRAY get_script_names()
+{
+    const u32 size{ (u32)ChillEngine::script::script_names().size() };
+    if (!size) return nullptr;
+    CComSafeArray<BSTR> names(size);
+    for (u32 i{ 0 }; i < size; ++i)
+    {
+        names.SetAt(i, A2BSTR_EX(ChillEngine::script::script_names()[i].c_str()), false);
+    }
+    return names.Detach();
+}
+#endif

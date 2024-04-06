@@ -1,5 +1,6 @@
 ﻿#include "Common.h"
 #include "../Engine/Common/CommonHeaders.h"
+#include "../Engine/Components/Script.h"
 
 //Some less frequently used headers will not be include to Speed up compilation.
 #ifndef WIN32_MEAN_AND_LEAN
@@ -12,6 +13,10 @@ using namespace ChillEngine;
 
 namespace {
     HMODULE game_code_dll{ nullptr };
+    using _get_script_creator = ChillEngine::script::detail::script_creator(*)(size_t);
+    _get_script_creator get_script_creator{ nullptr };
+    using _get_script_names = LPSAFEARRAY(*)(void);
+    _get_script_names get_script_names{ nullptr };
 } // anonymous namespace
 
 EDITOR_INTERFACE
@@ -21,7 +26,11 @@ u32 LoadGameCodeDll(const char* dll_path)
     game_code_dll = LoadLibraryA(dll_path);
     assert(game_code_dll);
 
-    return game_code_dll ? TRUE : FALSE;
+    get_script_creator = (_get_script_creator)GetProcAddress(game_code_dll, "get_script_creator");
+    get_script_names = (_get_script_names)GetProcAddress(game_code_dll, "get_script_names");
+
+    return (game_code_dll && get_script_creator && get_script_names) ? TRUE : FALSE;
+
 }
 
 EDITOR_INTERFACE
@@ -33,4 +42,17 @@ u32 UnloadGameCodeDll()
     assert(result);
     game_code_dll = nullptr;
     return TRUE;
+}
+
+
+EDITOR_INTERFACE script::detail::script_creator
+GetScriptCreator(const char* name)
+{
+    return (game_code_dll && get_script_creator) ? get_script_creator(std::hash<std::string>()(name)) : nullptr;
+}
+
+EDITOR_INTERFACE LPSAFEARRAY
+GetScriptNames()
+{
+    return (game_code_dll && get_script_names) ? get_script_names() : nullptr;
 }

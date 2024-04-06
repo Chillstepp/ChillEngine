@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Editor.Components;
@@ -13,11 +14,18 @@ namespace Editor.EngineAPIStructs
         public Vector3 Rotation;
         public Vector3 Scale;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    class ScriptComponent
+    {
+        public IntPtr ScriptCreator;
+    }
     
     [StructLayout(LayoutKind.Sequential)]
     class GameEntityDescriptor
     {
         public transformComponent Transform = new transformComponent();
+        public ScriptComponent Script = new ScriptComponent();
     }
 }
 
@@ -32,6 +40,13 @@ namespace Editor.DLLWrapper
 
         [DllImport(_engineDll)]
         public static extern int UnloadGameCodeDll();
+
+        [DllImport(_engineDll)]
+        public static extern IntPtr GetScriptCreator(string name);
+
+        [DllImport(_engineDll)]
+        [return: MarshalAs(UnmanagedType.SafeArray)]
+        public static extern string[] GetScriptNames();
         internal static class EntityAPI
         {
             //EngineAPI.cpp method: EDITOR_INTERFACE id::id_type CreateGameEntity(game_entity_descriptor* e)
@@ -48,6 +63,11 @@ namespace Editor.DLLWrapper
                     desc.Transform.Position = c.Position;
                     desc.Transform.Rotation = c.Rotation;
                     desc.Transform.Scale = c.Scale;
+                }
+                //Script component
+                {
+                    //var c = entity.GetComponent<Script>();
+                    
                 }
 
                 return CreateGameEntity(desc);
