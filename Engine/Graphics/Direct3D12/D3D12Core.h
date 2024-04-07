@@ -14,5 +14,8 @@ namespace ChillEngine::graphics::d3d12::core
         if(resource) resource->Release();
         resource = nullptr;
     }
-    
+
+    ID3D12Device *const device();
+    void set_deferred_releases_flag();
+    u32 current_frame_index();
 }

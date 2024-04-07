@@ -44,6 +44,8 @@ namespace ChillEngine::graphics::d3d12::core
                 //2.create command list
                 DXCall(hr = device->CreateCommandList(0, type, _cmd_frames[0].cmd_allocator, nullptr, IID_PPV_ARGS(&_cmd_list)));
                 if(FAILED(hr)) goto _error;
+                //cmdList reset 前要 close
+                DXCall(_cmd_list->Close());
                 NAME_D3D12_OBJECT(_cmd_list, type == D3D12_COMMAND_LIST_TYPE_DIRECT ? L"gfx command list" :
                     type==D3D12_COMMAND_LIST_TYPE_COMPUTE? L"Compute command list": L"Command list");
                 
@@ -160,58 +162,66 @@ namespace ChillEngine::graphics::d3d12::core
         
         ID3D12Device8*  main_device = nullptr;
         IDXGIFactory7*  dxgi_factory = nullptr;
-        d3d12Command   gfx_command;
+        d3d12Command    gfx_command;
+        u32             deferred_release_flag[frame_buffer_count]{};
+        std::mutex      deferred_releases_mutex{};
 
         bool failed_init()
         {
             shutdown();
             return false;
         }
-        
-        
-    }
 
-    // Get the first most performing adapter that supports the minimum feature level.
-    // NOTE: this function can be expanded in functionality with, for example, checking if any
-    //       output devices (i.e. screens) are attached, enumerate the supported resolutions, provide
-    //       a means for the user to choose which adapter to use in a multi-adapter setting, etc.
-    IDXGIAdapter4* determine_main_adapter()
-    {
-        IDXGIAdapter4* adapter = nullptr;
-        //获取性能最好的adapter
-        for(u32 i = 0;
-            dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND;
-            ++i)
+        // Get the first most performing adapter that supports the minimum feature level.
+        // NOTE: this function can be expanded in functionality with, for example, checking if any
+        //       output devices (i.e. screens) are attached, enumerate the supported resolutions, provide
+        //       a means for the user to choose which adapter to use in a multi-adapter setting, etc.
+        IDXGIAdapter4* determine_main_adapter()
         {
-            //pick first adapter that supports the minimum feature level.
-            if(SUCCEEDED(D3D12CreateDevice(adapter, minimum_feature_level, __uuidof(ID3D12Device), nullptr)))
+            IDXGIAdapter4* adapter = nullptr;
+            //获取性能最好的adapter
+            for(u32 i = 0;
+                dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND;
+                ++i)
             {
-                return adapter;
-            }
-            release(adapter);
+                //pick first adapter that supports the minimum feature level.
+                if(SUCCEEDED(D3D12CreateDevice(adapter, minimum_feature_level, __uuidof(ID3D12Device), nullptr)))
+                {
+                    return adapter;
+                }
+                release(adapter);
             
+            }
+            return nullptr;
         }
-        return nullptr;
+
+        D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
+        {
+            constexpr D3D_FEATURE_LEVEL feature_levels[4]{
+                D3D_FEATURE_LEVEL_11_0,
+                D3D_FEATURE_LEVEL_11_1,
+                D3D_FEATURE_LEVEL_12_0,
+                D3D_FEATURE_LEVEL_12_1,
+            };
+
+            D3D12_FEATURE_DATA_FEATURE_LEVELS feature_level_info{};
+            feature_level_info.NumFeatureLevels = _countof(feature_levels);
+            feature_level_info.pFeatureLevelsRequested = feature_levels;
+
+            ComPtr<ID3D12Device> device;
+            DXCall(D3D12CreateDevice(adapter, minimum_feature_level, IID_PPV_ARGS(&device)));
+            DXCall(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feature_level_info, sizeof(feature_level_info)));
+            return feature_level_info.MaxSupportedFeatureLevel;
+        }
+
+        void __declspec(noinline) process_deferred_releases(u32 frame_idx)
+        {
+            std::lock_guard lock = deferred_releases_mutex;
+            deferred_release_flag[frame_idx] = 0;
+        }
+        
     }
-
-    D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
-    {
-        constexpr D3D_FEATURE_LEVEL feature_levels[4]{
-            D3D_FEATURE_LEVEL_11_0,
-            D3D_FEATURE_LEVEL_11_1,
-            D3D_FEATURE_LEVEL_12_0,
-            D3D_FEATURE_LEVEL_12_1,
-        };
-
-        D3D12_FEATURE_DATA_FEATURE_LEVELS feature_level_info{};
-        feature_level_info.NumFeatureLevels = _countof(feature_levels);
-        feature_level_info.pFeatureLevelsRequested = feature_levels;
-
-        ComPtr<ID3D12Device> device;
-        DXCall(D3D12CreateDevice(adapter, minimum_feature_level, IID_PPV_ARGS(&device)));
-        DXCall(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feature_level_info, sizeof(feature_level_info)));
-        return feature_level_info.MaxSupportedFeatureLevel;
-    }
+    
 
     bool initialize()
     {
@@ -291,7 +301,12 @@ namespace ChillEngine::graphics::d3d12::core
         //1.wait for GPU to finish with the command allocator and reset the allocator once the GPU is done with it.
         //This frees the memory that used to store commands.
         gfx_command.begin_frame();
-        
+
+        const u32 frame_idx = current_frame_index();
+        if(deferred_release_flag[frame_idx])
+        {
+            process_deferred_releases(frame_idx);
+        }
 
         //2.Record commands to command list
         ID3D12GraphicsCommandList6* cmd_list = gfx_command.command_list();
@@ -301,5 +316,18 @@ namespace ChillEngine::graphics::d3d12::core
         gfx_command.end_frame();
     }
 
+    ID3D12Device *const device()
+    {
+        return main_device;
+    }
 
+    void set_deferred_releases_flag()
+    {
+        deferred_release_flag[current_frame_index()] = 1;
+    }
+
+    u32 current_frame_index()
+    {
+        return gfx_command.frame_index();
+    }
 }

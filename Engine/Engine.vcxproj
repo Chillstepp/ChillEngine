@@ -47,6 +47,7 @@
     <ClInclude Include="Graphics\Direct3D12\D3D12Common.h" />
     <ClInclude Include="Graphics\Direct3D12\D3D12Core.h" />
     <ClInclude Include="Graphics\Direct3D12\D3D12Interface.h" />
+    <ClInclude Include="Graphics\Direct3D12\D3D12Resources.h" />
     <ClInclude Include="Graphics\GraphicsPlatformInterface.h" />
     <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Platform\Platform.h" />
@@ -62,6 +63,7 @@
     <ClCompile Include="Core\Main.cpp" />
     <ClCompile Include="Graphics\Direct3D12\D3D12Core.cpp" />
     <ClCompile Include="Graphics\Direct3D12\D3D12Interface.cpp" />
+    <ClCompile Include="Graphics\Direct3D12\D3D12Resources.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
     <ClCompile Include="Platform\Platform.cpp" />
   </ItemGroup>

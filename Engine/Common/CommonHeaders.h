@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 #include <thread>
+#include <mutex>
 
 #if defined(_WIN64)
 #include <DirectXMath.h>
