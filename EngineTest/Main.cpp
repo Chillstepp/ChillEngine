@@ -1,13 +1,20 @@
 ﻿#pragma comment(lib, "engine.lib")
-#include "TestEntityComponents.h"
 
-#define TEST_ENTITY_COMPONENTS 1
+#define TEST_ENTITY_COMPONENTS 0
+#define TEST_RENDERER 1
 
 #if TEST_ENTITY_COMPONENTS
-
+#include "TestEntityComponents.h"
+#elif TEST_RENDERER
+#include "TestRenderer.h"
 #else
 #error One of the tests need to be enabled
 #endif
+
+#include <crtdbg.h>
+
+#ifdef _WIN64
+#include <Windows.h>
 
 int main()
 {
@@ -24,3 +31,4 @@ int main()
     
     return 0;
 }
+#endif // _WIN64
