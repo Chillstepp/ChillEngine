@@ -1,3 +1,4 @@
 ﻿  Main.cpp
-E:\ChillEngine\EngineTest\TestEntityComponents.h(18,24): warning C4244: 'argument': conversion from 'u32' to 'unsigned int', possible loss of data
+  TestRenderer.cpp
+E:\ChillEngine\EngineTest\TestRenderer.cpp(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 LINK : fatal error LNK1104: cannot open file 'engine.lib'

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\ChillEngine\ChillEngine\x64\DebugEditor\EngineDLL.dll</FullPath>
+      <FullPath>E:\ChillEngine\x64\DebugEditor\EngineDLL.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

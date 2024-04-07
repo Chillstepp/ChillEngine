@@ -33,4 +33,9 @@ namespace ChillEngine::graphics
     {
         gfx.shutdown();
     }
+
+    void render()
+    {
+        gfx.render();
+    }
 }

@@ -40,6 +40,7 @@ namespace Editor.GameProject
             get => _projectName;
             set
             {
+
                 if(_projectName != value)
                 {
                     _projectName = value;

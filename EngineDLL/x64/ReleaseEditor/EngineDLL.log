@@ -1,6 +1,6 @@
 ﻿     Creating library E:\ChillEngine\x64\ReleaseEditor\EngineDLL.lib and object E:\ChillEngine\x64\ReleaseEditor\EngineDLL.exp
   Generating code
   Previous IPDB not found, fall back to full compilation.
-  All 515 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 685 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   EngineDLL.vcxproj -> E:\ChillEngine\x64\ReleaseEditor\EngineDLL.dll

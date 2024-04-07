@@ -238,7 +238,7 @@ create_window(const window_init_info* const init_info /* = nullptr */)
     // adjust the window size for correct device size
     AdjustWindowRect(&rect, info.style, FALSE);
 
-    const wchar_t* caption{ (init_info && init_info->caption) ? init_info->caption : L"Primal Game" };
+    const wchar_t* caption{ (init_info && init_info->caption) ? init_info->caption : L"ChillEngine Game" };
     const s32 left{ init_info ? init_info->left : info.top_left.x };
     const s32 top{ init_info ? init_info->top : info.top_left.y };
     const s32 width{ rect.right - rect.left };

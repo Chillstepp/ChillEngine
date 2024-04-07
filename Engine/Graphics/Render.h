@@ -22,7 +22,7 @@ namespace ChillEngine::graphics {
     
     bool initialize(graphics_platform platform);
     void shutdown();
-    
+    void render();
 
 
 }

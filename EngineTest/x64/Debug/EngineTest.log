@@ -1,5 +1,3 @@
-﻿  Main.cpp
-  TestRenderer.cpp
-E:\ChillEngine\ChillEngine\EngineTest\TestRenderer.cpp(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  Generating Code...
-  EngineTest.vcxproj -> E:\ChillEngine\ChillEngine\x64\Debug\EngineTest.exe
+﻿  TestRenderer.cpp
+E:\ChillEngine\EngineTest\TestRenderer.cpp(5,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  EngineTest.vcxproj -> E:\ChillEngine\x64\Debug\EngineTest.exe
