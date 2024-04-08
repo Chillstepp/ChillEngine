@@ -31,7 +31,9 @@ namespace ChillEngine::graphics::d3d12
         ~descriptor_heap() {assert(!_heap);}
 
         bool initialize(u32 capacity, bool is_shader_visible);
+        void process_deferred_free(u32 frame_idx);
         void release();
+        
 
         descriptor_handle allocate();
         void free(descriptor_handle& handle);
@@ -53,7 +55,7 @@ namespace ChillEngine::graphics::d3d12
         u32                                 _capacity = 0;
         u32                                 _size = 0;//how many descriptor has been allocated
         u32                                 _descriptor_size = 0;
-        std::vector<u32>                    _deferred_free_indices[frame_buffer_count]{};
+        utl::vector<u32>                    _deferred_free_indices[frame_buffer_count]{};
         const D3D12_DESCRIPTOR_HEAP_TYPE    _type;
         std::mutex                          _mutex{};
         std::unique_ptr<u32[]>              _free_handles;

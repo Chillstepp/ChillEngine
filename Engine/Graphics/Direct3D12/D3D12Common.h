@@ -3,10 +3,12 @@
 
 #include "../../Common/CommonHeaders.h"
 #include "../../Graphics/Render.h"
+#include "../../Utilities/Utilities.h"
 
 #include <dxgi1_6.h> //ms把他从directX解耦出来，处理adapter，输出设备，交换链等
 #include <d3d12.h> // 核心图形功能
 #include <wrl.h> // d3d12 使用组件对象模型实现，提供了ComPtr访问组件
+
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d12.lib")

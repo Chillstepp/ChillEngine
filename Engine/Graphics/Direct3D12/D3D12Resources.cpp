@@ -7,7 +7,7 @@ namespace ChillEngine::graphics::d3d12
     bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
     {
         //可能会线程创建资源描述符，所以需要加锁避免数据竞争
-        std::lock_guard lock = _mutex;
+        std::lock_guard lock(_mutex);
         assert(capacity && capacity < D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2);
         assert(!(_type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER &&
             capacity > D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE));
@@ -37,6 +37,8 @@ namespace ChillEngine::graphics::d3d12
         _size = 0;
 
         for(u32 i = 0; i < capacity; ++i) _free_handles[i] = i;
+        DEBUG_OP(for(u32 i = 0; i < frame_buffer_count; ++i) assert(_deferred_free_indices[i].empty()));
+        
         _descriptor_size = device->GetDescriptorHandleIncrementSize(_type);
         _cpu_start = _heap->GetCPUDescriptorHandleForHeapStart();
         _gpu_start = is_shader_visible ? _heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE(0);
@@ -45,14 +47,32 @@ namespace ChillEngine::graphics::d3d12
         
     }
 
+    void descriptor_heap::process_deferred_free(u32 frame_idx)
+    {
+        std::lock_guard lock(_mutex);
+        assert(frame_idx < frame_buffer_count);
+
+        utl::vector<u32>& indices = _deferred_free_indices[frame_idx];
+        if(!indices.empty())
+        {
+            for(auto index : indices)
+            {
+                --_size;
+                _free_handles[_size] = index;
+            }
+            indices.clear();
+        }
+    }
+
     void descriptor_heap::release()
     {
-        
+        assert(!_size);
+        core::deferred_release(_heap);
     }
     
     descriptor_handle descriptor_heap::allocate()
     {
-        std::lock_guard lock = _mutex;
+        std::lock_guard lock(_mutex);
         assert(_heap);
         assert(_size < _capacity);
         const u32 index = _free_handles[_size];
@@ -75,7 +95,7 @@ namespace ChillEngine::graphics::d3d12
     void descriptor_heap::free(descriptor_handle& handle)
     {
         if(!handle.is_valid()) return;
-        std::lock_guard lock = _mutex;
+        std::lock_guard lock(_mutex);
         assert(_heap && _size);
         assert(handle.container == this);
         assert(handle.cpu.ptr >= _cpu_start.ptr);
@@ -87,7 +107,7 @@ namespace ChillEngine::graphics::d3d12
         //safely release resource, some resource may still be referenced by gpu
         const u32 frane_index = core::current_frame_index();
         _deferred_free_indices[frane_index].push_back(index);
-        core::set_deferred_released_flag();
+        core::set_deferred_releases_flag();
         handle = {};
         
     }

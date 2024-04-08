@@ -1,5 +1,7 @@
 #include "D3D12Core.h"
 
+#include "D3D12Resources.h"
+
 constexpr D3D_FEATURE_LEVEL minimum_feature_level = D3D_FEATURE_LEVEL_11_0;
 
 using namespace Microsoft::WRL;
@@ -149,6 +151,7 @@ namespace ChillEngine::graphics::d3d12::core
                 void release()
                 {
                     core::release(cmd_allocator);
+                    fence_value = 0;
                 }
             };
             ID3D12CommandQueue*         _cmd_queue = nullptr;
@@ -163,8 +166,14 @@ namespace ChillEngine::graphics::d3d12::core
         ID3D12Device8*  main_device = nullptr;
         IDXGIFactory7*  dxgi_factory = nullptr;
         d3d12Command    gfx_command;
-        u32             deferred_release_flag[frame_buffer_count]{};
-        std::mutex      deferred_releases_mutex{};
+        descriptor_heap rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//渲染目标视图资源 render target view
+        descriptor_heap srv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//着色器视图 shader resource view
+        descriptor_heap uav_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//无需访问视图 unordered access view
+        descriptor_heap dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);//深度/模板视图资源  depth/stencil view
+        
+        utl::vector<IUnknown*>  deferred_releases[frame_buffer_count]{};
+        u32                     deferred_release_flag[frame_buffer_count]{};
+        std::mutex              deferred_releases_mutex{};
 
         bool failed_init()
         {
@@ -216,12 +225,40 @@ namespace ChillEngine::graphics::d3d12::core
 
         void __declspec(noinline) process_deferred_releases(u32 frame_idx)
         {
-            std::lock_guard lock = deferred_releases_mutex;
+            std::lock_guard lock(deferred_releases_mutex);
+            //NOTE: we clear this flag in the beginning.If we  clear it at the end , it will cause something wrong:
+            //set_deferred_releases_flag() also set deferred_release_flag = 1, and it don't lock_guard because in x86 , access integer is atomic.
+            //That will 
             deferred_release_flag[frame_idx] = 0;
+            //release pending resources
+            rtv_desc_heap.process_deferred_free(frame_idx);
+            srv_desc_heap.process_deferred_free(frame_idx);
+            uav_desc_heap.process_deferred_free(frame_idx);
+            dsv_desc_heap.process_deferred_free(frame_idx);
+
+            utl::vector<IUnknown*>& resources = deferred_releases[frame_idx];
+            if(!resources.empty())
+            {
+                for(auto& resource: resources)
+                {
+                    release(resource);
+                }
+                resources.clear();
+            }
         }
         
     }
-    
+
+    namespace detail
+    {
+        void deferred_release(IUnknown* resource)
+        {
+            const u32 frame_idx = current_frame_index();
+            std::lock_guard lock(deferred_releases_mutex);
+            deferred_releases[frame_idx].push_back(resource);
+            set_deferred_releases_flag();
+        }
+    }
 
     bool initialize()
     {
@@ -236,8 +273,14 @@ namespace ChillEngine::graphics::d3d12::core
         // Enable debugging layer. Requires "Graphics Tools" optional feature
         {
             ComPtr<ID3D12Debug3> debug_interface;
-            DXCall(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_interface)));
-            debug_interface->EnableDebugLayer();
+            if(SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_interface))))
+            {
+                debug_interface->EnableDebugLayer();
+            }
+            else
+            {
+                OutputDebugStringA("Warning: D3D12 Debug interface is not available.Requires 'Graphics Tools' optional feature.");
+            }
             dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
         }
 #endif
@@ -256,10 +299,6 @@ namespace ChillEngine::graphics::d3d12::core
         DXCall(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, IID_PPV_ARGS(&main_device)));
         if(FAILED(hr)) return failed_init();
 
-        new (&gfx_command) d3d12Command(main_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        if(!gfx_command.command_queue()) return failed_init();
-        
-        NAME_D3D12_OBJECT(main_device, L"MAIN D3D12 DEVICE");
 #ifdef _DEBUG
         {
             ComPtr<ID3D12InfoQueue> info_queue;
@@ -269,13 +308,46 @@ namespace ChillEngine::graphics::d3d12::core
             info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
         }
 #endif
+        
+        bool result = true;
+        result &= rtv_desc_heap.initialize(512, false);
+        result &= dsv_desc_heap.initialize(512, false);
+        result &= srv_desc_heap.initialize(4096, true);
+        result &= uav_desc_heap.initialize(512, false);
+        if(!result) return failed_init();
+        
+        new (&gfx_command) d3d12Command(main_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        if(!gfx_command.command_queue()) return failed_init();
+        
+        NAME_D3D12_OBJECT(main_device, L"MAIN D3D12 DEVICE");
+        NAME_D3D12_OBJECT(rtv_desc_heap.heap(), L"RTV Descriptor Heap");
+        NAME_D3D12_OBJECT(srv_desc_heap.heap(), L"SRV Descriptor Heap");
+        NAME_D3D12_OBJECT(uav_desc_heap.heap(), L"UAV Descriptor Heap");
+        NAME_D3D12_OBJECT(dsv_desc_heap.heap(), L"DSV Descriptor Heap");
+
         return true;
     }
 
     void shutdown()
     {
         gfx_command.release();
+        //note: we don't call process_deferred_releases at the end because some resource(such as swap chains) can't be released before
+        //their depending resources are released.
+        for(u32 i = 0; i < frame_buffer_count; ++i)
+        {
+            process_deferred_releases(i);
+        }
         release(dxgi_factory);
+        
+        rtv_desc_heap.release();
+        dsv_desc_heap.release();
+        srv_desc_heap.release();
+        uav_desc_heap.release();
+
+        //note:some types only use deferred release for their resources during
+        //      shutdown/reset/clear. To finally release these resources we call process_deferred_releases once more.
+        process_deferred_releases(0);
+
 #ifdef _DEBUG
         {
             {
