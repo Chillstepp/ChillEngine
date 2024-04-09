@@ -1,4 +1,13 @@
 ﻿  Main.cpp
   TestRenderer.cpp
-E:\ChillEngine\EngineTest\TestRenderer.cpp(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-LINK : fatal error LNK1104: cannot open file 'engine.lib'
+  Generating code
+  252 of 510 functions (49.4%) were compiled, the rest were copied from previous compilation.
+    105 functions were new in current compilation
+    21 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+engine.lib(D3D12Interface.obj) : warning LNK4020: a type record in 'e:\chillengine\x64\releaseeditor\Engine.pdb' is corrupted; some symbols and types may not be accessible from the debugger
+engine.lib(D3D12Interface.obj) : warning LNK4020: a type record in 'e:\chillengine\x64\releaseeditor\Engine.pdb' is corrupted; some symbols and types may not be accessible from the debugger
+engine.lib(D3D12Interface.obj) : warning LNK4020: a type record in 'e:\chillengine\x64\releaseeditor\Engine.pdb' is corrupted; some symbols and types may not be accessible from the debugger
+kernel32.lib(KERNEL32.dll) : warning LNK4020: a type record in 'e:\chillengine\x64\releaseeditor\Engine.pdb' is corrupted; some symbols and types may not be accessible from the debugger
+MSVCRT.lib(gs_report.obj) : warning LNK4020: a type record in 'e:\chillengine\x64\releaseeditor\Engine.pdb' is corrupted; some symbols and types may not be accessible from the debugger
+msvcprt.lib(MSVCP140.dll) : fatal error LNK1318: Unexpected PDB error; OK (0) 'e:\chillengine\x64\releaseeditor\Engine.pdb'

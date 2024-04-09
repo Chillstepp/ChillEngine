@@ -1,4 +1,10 @@
 e:\chillengine\x64\releaseeditor\engine.pdb
+e:\chillengine\engine\x64\releaseeditor\platform.obj
+e:\chillengine\engine\x64\releaseeditor\render.obj
+e:\chillengine\engine\x64\releaseeditor\d3d12surface.obj
+e:\chillengine\engine\x64\releaseeditor\d3d12resources.obj
+e:\chillengine\engine\x64\releaseeditor\d3d12interface.obj
+e:\chillengine\engine\x64\releaseeditor\d3d12core.obj
 e:\chillengine\engine\x64\releaseeditor\main.obj
 e:\chillengine\engine\x64\releaseeditor\transform.obj
 e:\chillengine\engine\x64\releaseeditor\script.obj

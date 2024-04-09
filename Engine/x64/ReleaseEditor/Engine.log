@@ -1,17 +1,3 @@
-﻿  Entity.cpp
-  Script.cpp
-  Transform.cpp
-  Main.cpp
-  D3D12Core.cpp
-  D3D12Interface.cpp
-  Render.cpp
-  Platform.cpp
-E:\ChillEngine\Engine\Platform\Platform.cpp(117,68): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(117,61): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(232,41): warning C4244: '=': conversion from 's32' to 'LONG', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(233,42): warning C4244: '=': conversion from 's32' to 'LONG', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(254,16): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(254,9): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(253,15): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
-E:\ChillEngine\Engine\Platform\Platform.cpp(253,9): warning C4244: 'argument': conversion from 'const s32' to 'int', possible loss of data
+﻿  D3D12Core.cpp
+  D3D12Surface.cpp
   Engine.vcxproj -> E:\ChillEngine\x64\ReleaseEditor\Engine.lib

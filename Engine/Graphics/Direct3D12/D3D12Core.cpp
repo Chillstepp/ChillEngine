@@ -1,8 +1,8 @@
 #include "D3D12Core.h"
 
 #include "D3D12Resources.h"
+#include "D3D12Surface.h"
 
-constexpr D3D_FEATURE_LEVEL minimum_feature_level = D3D_FEATURE_LEVEL_11_0;
 
 using namespace Microsoft::WRL;
 
@@ -163,17 +163,21 @@ namespace ChillEngine::graphics::d3d12::core
             u32                         _frame_index = 0;
         };
         
-        ID3D12Device8*  main_device = nullptr;
-        IDXGIFactory7*  dxgi_factory = nullptr;
-        d3d12Command    gfx_command;
-        descriptor_heap rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//渲染目标视图资源 render target view
-        descriptor_heap srv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//着色器视图 shader resource view
-        descriptor_heap uav_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//无需访问视图 unordered access view
-        descriptor_heap dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);//深度/模板视图资源  depth/stencil view
+        ID3D12Device8*                  main_device = nullptr;
+        IDXGIFactory7*                  dxgi_factory = nullptr;
+        d3d12Command                    gfx_command;
+        utl::vector<d3d12_surface>      surfaces;
+        descriptor_heap                 rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//渲染目标视图资源 render target view
+        descriptor_heap                 srv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//着色器视图 shader resource view
+        descriptor_heap                 uav_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//无需访问视图 unordered access view
+        descriptor_heap                 dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);//深度/模板视图资源  depth/stencil view
         
-        utl::vector<IUnknown*>  deferred_releases[frame_buffer_count]{};
-        u32                     deferred_release_flag[frame_buffer_count]{};
-        std::mutex              deferred_releases_mutex{};
+        utl::vector<IUnknown*>          deferred_releases[frame_buffer_count]{};
+        u32                             deferred_release_flag[frame_buffer_count]{};
+        std::mutex                      deferred_releases_mutex{};
+
+        constexpr D3D_FEATURE_LEVEL minimum_feature_level = D3D_FEATURE_LEVEL_11_0;
+        constexpr DXGI_FORMAT render_target_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
         bool failed_init()
         {
@@ -368,25 +372,25 @@ namespace ChillEngine::graphics::d3d12::core
         release(main_device);
     }
 
-    void render()
-    {
-        //1.wait for GPU to finish with the command allocator and reset the allocator once the GPU is done with it.
-        //This frees the memory that used to store commands.
-        gfx_command.begin_frame();
-
-        const u32 frame_idx = current_frame_index();
-        if(deferred_release_flag[frame_idx])
-        {
-            process_deferred_releases(frame_idx);
-        }
-
-        //2.Record commands to command list
-        ID3D12GraphicsCommandList6* cmd_list = gfx_command.command_list();
-
-        //3.Done recording commands. ExecuteCommands now.
-        //signal and increment the fence for next frame.
-        gfx_command.end_frame();
-    }
+    // void render()
+    // {
+    //     //1.wait for GPU to finish with the command allocator and reset the allocator once the GPU is done with it.
+    //     //This frees the memory that used to store commands.
+    //     gfx_command.begin_frame();
+    //
+    //     const u32 frame_idx = current_frame_index();
+    //     if(deferred_release_flag[frame_idx])
+    //     {
+    //         process_deferred_releases(frame_idx);
+    //     }
+    //
+    //     //2.Record commands to command list
+    //     ID3D12GraphicsCommandList6* cmd_list = gfx_command.command_list();
+    //
+    //     //3.Done recording commands. ExecuteCommands now.
+    //     //signal and increment the fence for next frame.
+    //     gfx_command.end_frame();
+    // }
 
     ID3D12Device *const device()
     {
@@ -401,5 +405,84 @@ namespace ChillEngine::graphics::d3d12::core
     u32 current_frame_index()
     {
         return gfx_command.frame_index();
+    }
+
+    surface create_surface(platform::window window)
+    {
+        //be careful of this: window will be used construct a temporary d3d12_surface and then move it to back of the vector.
+        //and because it is a non-trivial class , the default move construct is wrong
+        surfaces.emplace_back(window);
+        surface_id id((u32)surfaces.size() -1);
+        surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), render_target_format);
+        return surface{id};
+    }
+
+    void remove_surface(surface_id id)
+    {
+        gfx_command.flush();
+        //todo: till we have a free-list container. surfaces[id] = d3d12_surface{};
+        surfaces[id].~d3d12_surface();
+    }
+
+    void resize_surface(surface_id id, u32, u32)
+    {
+        gfx_command.flush();
+        surfaces[id].resize();
+    }
+
+    u32 surface_width(surface_id id)
+    {
+        return surfaces[id].width();
+    }
+
+    u32 surface_height(surface_id id)
+    {
+        return surfaces[id].height();
+    }
+
+    void render_surface(surface_id id)
+    {
+        //1.wait for GPU to finish with the command allocator and reset the allocator once the GPU is done with it.
+        //This frees the memory that used to store commands.
+        gfx_command.begin_frame();
+        ID3D12GraphicsCommandList6* cmd_list = gfx_command.command_list();
+        const u32 frame_idx = current_frame_index();
+        if(deferred_release_flag[frame_idx])
+        {
+            process_deferred_releases(frame_idx);
+        }
+
+        const d3d12_surface& surface = surfaces[id];
+
+        
+        //presenting swap chain buffers happens in lockstep with frame buffers.
+        surface.present();
+
+        //2.record commands
+        
+        //3.Done recording commands. ExecuteCommands now.
+        //signal and increment the fence for next frame.
+        gfx_command.end_frame();
+    }
+
+    descriptor_heap& rtv_heap()
+    {
+        return rtv_desc_heap;
+    }
+    descriptor_heap& srv_heap()
+    {
+        return srv_desc_heap;
+    }
+    descriptor_heap& uav_heap()
+    {
+        return uav_desc_heap;
+    }
+    descriptor_heap& dsv_heap()
+    {
+        return dsv_desc_heap;
+    }
+    DXGI_FORMAT get_default_render_target_format()
+    {
+        return render_target_format;
     }
 }

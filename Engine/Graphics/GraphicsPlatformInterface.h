@@ -6,7 +6,7 @@ namespace ChillEngine::graphics
     {
         bool (*initialize)(void);
         void (*shutdown)(void);
-        void (*render)(void);
+        //void (*render)(void);
 
         struct{
             surface(*create) (platform::window);
@@ -14,7 +14,7 @@ namespace ChillEngine::graphics
             void(*resize)(surface_id, u32, u32);
             u32(*width)(surface_id);
             u32(*height)(surface_id);
-            u32(*render)(surface_id);
+            void(*render)(surface_id);
         } surface;
     };
     
