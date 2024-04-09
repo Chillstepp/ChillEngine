@@ -36,7 +36,7 @@ namespace ChillEngine::graphics::d3d12
         desc.Flags = _allow_tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
         desc.Format = to_non_srgb(format);
         desc.Height = _window.height();
-        desc.Width = _window.width();\
+        desc.Width = _window.width();
         //不需要任何的AA 
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
@@ -88,6 +88,7 @@ namespace ChillEngine::graphics::d3d12
         {
             render_target_data& data = _render_target_data[i];
             assert(!data.resource);
+            //用于获取交换链中的后台缓冲区
             DXCall(_swap_chain->GetBuffer(i, IID_PPV_ARGS(&data.resource)));
             D3D12_RENDER_TARGET_VIEW_DESC desc{};
             desc.Format = core::get_default_render_target_format();
