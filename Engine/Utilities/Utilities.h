@@ -28,8 +28,10 @@ namespace ChillEngine::utl
 #include "Vector.h"
 namespace ChillEngine::utl
 {
+    
+    
     template<typename T>
-    void erase_unordered(vector<T>& v, size_t index)
+    void erase_unordered(T& v, size_t index)
     {
         v.erase_unordered(index);
     }
