@@ -68,6 +68,8 @@ namespace ChillEngine::graphics::d3d12
             _allow_tearing = o._allow_tearing;
             _present_flag = o._present_flag;
         }
+#else
+        DISABLE_COPY_AND_MOVE(d3d12_surface)
 #endif
         
         ~d3d12_surface() {release();}

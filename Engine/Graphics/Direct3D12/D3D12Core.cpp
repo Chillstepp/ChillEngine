@@ -162,11 +162,12 @@ namespace ChillEngine::graphics::d3d12::core
             HANDLE                      _fence_event = nullptr;
             u32                         _frame_index = 0;
         };
-        
+
+        using surface_collection = utl::free_list<d3d12_surface>;
         ID3D12Device8*                  main_device = nullptr;
         IDXGIFactory7*                  dxgi_factory = nullptr;
         d3d12Command                    gfx_command;
-        utl::vector<d3d12_surface>      surfaces;
+        surface_collection              surfaces;
         descriptor_heap                 rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//渲染目标视图资源 render target view
         descriptor_heap                 srv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//着色器视图 shader resource view
         descriptor_heap                 uav_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//无需访问视图 unordered access view
@@ -411,8 +412,8 @@ namespace ChillEngine::graphics::d3d12::core
     {
         //be careful of this: window will be used construct a temporary d3d12_surface and then move it to back of the vector.
         //and because it is a non-trivial class , the default move construct is wrong
-        surfaces.emplace_back(window);
-        surface_id id((u32)surfaces.size() -1);
+        u32 index = surfaces.add(window);
+        surface_id id((u32)index);
         surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), render_target_format);
         return surface{id};
     }
@@ -420,8 +421,8 @@ namespace ChillEngine::graphics::d3d12::core
     void remove_surface(surface_id id)
     {
         gfx_command.flush();
-        //todo: till we have a free-list container. surfaces[id] = d3d12_surface{};
-        surfaces[id].~d3d12_surface();
+        
+        surfaces.remove(id);
     }
 
     void resize_surface(surface_id id, u32, u32)
