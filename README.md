@@ -36,9 +36,12 @@ The engine contains four basic modules.
 - Data-oriented
 - Transform/Script component.
 
-
 ## Rendering Feature
 
-- RHI: DX12(WIP), Vulkan(Planning)
+### DX12 Wrapper
+
+- d3dx12.h like helper function/struct.
+
+- 
 
   
