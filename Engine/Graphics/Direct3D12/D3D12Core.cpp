@@ -8,6 +8,8 @@ using namespace Microsoft::WRL;
 
 namespace ChillEngine::graphics::d3d12::core
 {
+    //todo: we will remove it later
+    void create_a_root_signature();
     namespace
     {
         
@@ -330,6 +332,8 @@ namespace ChillEngine::graphics::d3d12::core
         NAME_D3D12_OBJECT(uav_desc_heap.heap(), L"UAV Descriptor Heap");
         NAME_D3D12_OBJECT(dsv_desc_heap.heap(), L"DSV Descriptor Heap");
 
+        create_a_root_signature();
+
         return true;
     }
 
@@ -485,5 +489,106 @@ namespace ChillEngine::graphics::d3d12::core
     DXGI_FORMAT get_default_render_target_format()
     {
         return render_target_format;
+    }
+
+
+    void create_a_root_signature()
+    {
+        HRESULT hr = S_OK;
+        
+        D3D12_VERSIONED_ROOT_SIGNATURE_DESC root_sig_desc;
+        D3D12_ROOT_PARAMETER1 params[3];
+        
+        {// param[0] : 2 constants
+            auto& param = params[0];
+            param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+            param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+            
+            D3D12_ROOT_CONSTANTS consts;
+            consts.Num32BitValues = 2;
+            consts.ShaderRegister = 0;//b0
+            consts.RegisterSpace = 0;
+            param.Constants = consts;
+        }
+
+        {//param[1] : 1 constant buffer view(descriptor)
+            auto& param = params[1];
+            param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+            param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+            D3D12_ROOT_DESCRIPTOR1 root_descriptor;
+            root_descriptor.Flags = D3D12_ROOT_DESCRIPTOR_FLAG_NONE;
+            root_descriptor.ShaderRegister = 1;
+            root_descriptor.RegisterSpace = 0;
+            param.Descriptor = root_descriptor;
+        }
+
+        {//param[2] : descriptor table(unbounded/bindless)
+            auto& param = params[2];
+            param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+            param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+            D3D12_ROOT_DESCRIPTOR_TABLE1 table;
+            table.NumDescriptorRanges = 1;
+            D3D12_DESCRIPTOR_RANGE1 range;
+            {
+                range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+                range.NumDescriptors = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+                range.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_VOLATILE;
+                range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+                range.BaseShaderRegister = 0;
+                range.RegisterSpace = 0;
+            }
+            table.pDescriptorRanges = &range;
+            
+            param.DescriptorTable = table;
+            
+            
+        }
+
+        //static sampler:
+        D3D12_STATIC_SAMPLER_DESC sampler_desc{};
+        sampler_desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler_desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler_desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler_desc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        
+        
+        D3D12_ROOT_SIGNATURE_DESC1 desc;//需要哪儿些参数，哪儿些sampler
+        desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS|
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS|
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS;
+        desc.NumParameters = _countof(params);
+        desc.pParameters = &params[0];
+        desc.NumStaticSamplers = 1;
+        desc.pStaticSamplers = &sampler_desc;
+
+        root_sig_desc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
+        root_sig_desc.Desc_1_1 = desc;
+        
+        ID3DBlob* root_sig_blob = nullptr;//根签名序列化后的结果, 一个二进制数据块
+        ID3DBlob* error_blob = nullptr;//序列化时的错误信息
+        if(FAILED(hr = D3D12SerializeVersionedRootSignature(&root_sig_desc,&root_sig_blob, &error_blob)))
+        {
+            DEBUG_OP(const char* error_msg{error_blob? (const char *)error_blob->GetBufferPointer(): "" });
+            DEBUG_OP(OutputDebugStringA(error_msg));
+            return;
+        }
+        
+        assert(root_sig_blob);
+        ID3D12RootSignature* root_sig;
+        DXCall(hr = device()->CreateRootSignature(0, root_sig_blob->GetBufferPointer(), root_sig_blob->GetBufferSize(), IID_PPV_ARGS(&root_sig)));
+
+        //relase 
+        release(root_sig_blob);
+        release(error_blob);
+
+        //use root_sig
+
+
+        //when render shut down
+        release(root_sig);
     }
 }
