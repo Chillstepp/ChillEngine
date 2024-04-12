@@ -8,6 +8,8 @@ namespace ChillEngine::graphics::d3d12
 {
     void get_platform_interface(platform_interface& pi)
     {
+        pi.platform = graphics_platform::direct3d12;
+        
         pi.initialize = core::initialize;
         pi.shutdown = core::shutdown;
         

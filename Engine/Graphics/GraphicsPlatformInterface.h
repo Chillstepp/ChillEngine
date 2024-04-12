@@ -4,6 +4,7 @@ namespace ChillEngine::graphics
 {
     struct platform_interface
     {
+        
         bool (*initialize)(void);
         void (*shutdown)(void);
         //void (*render)(void);
@@ -16,6 +17,8 @@ namespace ChillEngine::graphics
             u32(*height)(surface_id);
             void(*render)(surface_id);
         } surface;
+
+        graphics_platform platform = static_cast<graphics_platform>(-1);
     };
     
 }

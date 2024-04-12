@@ -10,6 +10,7 @@ namespace ChillEngine::graphics::d3d12
     {
     public:
         constexpr static u32 buffer_count = 3;
+        constexpr static DXGI_FORMAT default_back_buffer_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         explicit d3d12_surface(platform::window window) : _window(window)
         {
             assert(_window.handle());
@@ -81,7 +82,7 @@ namespace ChillEngine::graphics::d3d12
          * \param command_queue 
          * \param format: what format to render.
          */
-        void create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* command_queue, DXGI_FORMAT format);
+        void create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* command_queue, DXGI_FORMAT format = default_back_buffer_format);
         void present() const;
         void resize();
 
@@ -105,6 +106,7 @@ namespace ChillEngine::graphics::d3d12
         IDXGISwapChain4*    _swap_chain = nullptr;
         render_target_data  _render_target_data[buffer_count]{};
         platform::window    _window{};
+        DXGI_FORMAT         _format{default_back_buffer_format};//后备缓冲区的格式
         mutable  u32        _current_backbuffer_index = 0;
         D3D12_VIEWPORT      _viewport{};//视口是用于显示和渲染的区域，控制了渲染目标中哪部分内容会被渲染到屏幕上。
         D3D12_RECT          _scissor_rect{};// 通常用于指定渲染目标或纹理中的矩形区域，以控制渲染或处理的区域范围。

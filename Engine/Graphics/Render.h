@@ -40,4 +40,8 @@ namespace ChillEngine::graphics {
     surface create_surface(platform::window window);
     void remove_surface(surface_id id);
 
+    //get the location of compiled shaders relative to the executable's path.
+    //The path is for the graphics API
+    const char* get_engine_shaders_path();
+
 }

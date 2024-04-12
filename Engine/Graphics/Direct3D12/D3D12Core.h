@@ -44,7 +44,6 @@ namespace ChillEngine::graphics::d3d12::core
     descriptor_heap& srv_heap();
     descriptor_heap& uav_heap();
     descriptor_heap& dsv_heap();
-    DXGI_FORMAT get_default_render_target_format();
     ID3D12Device8 *const device();
     void set_deferred_releases_flag();
     u32 current_frame_index();

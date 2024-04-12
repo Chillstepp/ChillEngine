@@ -46,7 +46,7 @@ public:
 
     // Move-constructor. Constructs by moving another vector.
     // The original vector will be empty after move.
-    constexpr vector(const vector&& o)
+    constexpr vector(vector&& o)
         : _capacity{ o._capacity }, _size{ o._size }, _data{ o._data }
     {
         o.reset();

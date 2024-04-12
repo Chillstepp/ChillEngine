@@ -7,6 +7,12 @@ namespace ChillEngine::graphics
 {
     namespace
     {
+        constexpr const char* engine_shader_paths[]
+        {
+            R"(.\shader\d3d12\shaders.bin)",
+            //"etc"
+        };
+        
         platform_interface gfx;
 
         bool set_platform_interface(graphics_platform platform)
@@ -45,6 +51,12 @@ namespace ChillEngine::graphics
     {
         assert(id::is_valid(id));
         return gfx.surface.remove(id);
+    }
+
+    //获取对应图形API下的Shader编译结果目录
+    const char* get_engine_shaders_path()
+    {
+        return engine_shader_paths[(u32)gfx.platform];
     }
 
     void surface::resize(u32 width, u32 height) const

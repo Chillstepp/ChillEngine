@@ -15,7 +15,7 @@ namespace ChillEngine::graphics::d3d12
         }
     }
     
-    void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* command_queue, DXGI_FORMAT format)
+    void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* command_queue, DXGI_FORMAT format/* = default_back_buffer_format*/)
     {
         assert(factory && command_queue);
         release();
@@ -24,6 +24,8 @@ namespace ChillEngine::graphics::d3d12
         {
             _present_flag = DXGI_PRESENT_ALLOW_TEARING;
         }
+
+        _format = format;
 
         //diable tearing now.
         _allow_tearing = _present_flag = 0;
@@ -91,7 +93,7 @@ namespace ChillEngine::graphics::d3d12
             //用于获取交换链中的后台缓冲区
             DXCall(_swap_chain->GetBuffer(i, IID_PPV_ARGS(&data.resource)));
             D3D12_RENDER_TARGET_VIEW_DESC desc{};
-            desc.Format = core::get_default_render_target_format();
+            desc.Format = _format;
             desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
             core::device()->CreateRenderTargetView(data.resource, &desc, data.rtv.cpu);
         }
