@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "D3D12Common.h"
-#include "D3D12Resources.h"
 
 
 namespace ChillEngine::graphics::d3d12

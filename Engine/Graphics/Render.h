@@ -44,4 +44,6 @@ namespace ChillEngine::graphics {
     //The path is for the graphics API
     const char* get_engine_shaders_path();
 
+    const char* get_engine_shaders_path(graphics_platform platform);
+
 }

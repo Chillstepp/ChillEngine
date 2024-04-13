@@ -1,7 +1,5 @@
 ﻿#include "D3D12Surface.h"
-
 #include "D3D12Core.h"
-#include "D3D12Resources.h"
 
 namespace ChillEngine::graphics::d3d12
 {

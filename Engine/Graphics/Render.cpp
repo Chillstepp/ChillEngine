@@ -59,6 +59,12 @@ namespace ChillEngine::graphics
         return engine_shader_paths[(u32)gfx.platform];
     }
 
+    
+    const char* get_engine_shaders_path(graphics_platform platform)
+    {
+        return engine_shader_paths[(u32)platform];
+    }
+
     void surface::resize(u32 width, u32 height) const
     {
         assert(is_valid());

@@ -64,3 +64,7 @@ OutputDebugString(L"\n");
 #define NAME_D3D12_OBJECT(obj, name)
 #define NAME_D3D12_OBJECT_Indexed(obj, idx, name)
 #endif
+
+
+#include "D3D12Helpers.h"
+#include "D3D12Resources.h"

@@ -1,7 +1,6 @@
 #include "D3D12Core.h"
 
-#include "D3D12Helpers.h"
-#include "D3D12Resources.h"
+#include "D3D12Shaders.h"
 #include "D3D12Surface.h"
 
 
@@ -180,7 +179,6 @@ namespace ChillEngine::graphics::d3d12::core
         std::mutex                      deferred_releases_mutex{};
 
         constexpr D3D_FEATURE_LEVEL minimum_feature_level = D3D_FEATURE_LEVEL_11_0;
-        constexpr DXGI_FORMAT render_target_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
         bool failed_init()
         {
@@ -331,7 +329,9 @@ namespace ChillEngine::graphics::d3d12::core
         NAME_D3D12_OBJECT(srv_desc_heap.heap(), L"SRV Descriptor Heap");
         NAME_D3D12_OBJECT(uav_desc_heap.heap(), L"UAV Descriptor Heap");
         NAME_D3D12_OBJECT(dsv_desc_heap.heap(), L"DSV Descriptor Heap");
-        
+
+        //initialize shader module.
+        if(!shaders::initialize()) return failed_init();
 
         return true;
     }
@@ -345,6 +345,9 @@ namespace ChillEngine::graphics::d3d12::core
         {
             process_deferred_releases(i);
         }
+
+        //shut down module
+        shaders::shutdown();
         release(dxgi_factory);
         
         rtv_desc_heap.release();
@@ -417,7 +420,7 @@ namespace ChillEngine::graphics::d3d12::core
         //and because it is a non-trivial class , the default move construct is wrong
         u32 index = surfaces.add(window);
         surface_id id((u32)index);
-        surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), render_target_format);
+        surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue());
         return surface{id};
     }
 
