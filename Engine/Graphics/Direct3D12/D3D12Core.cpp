@@ -1,7 +1,9 @@
 #include "D3D12Core.h"
 
+#include "D3D12Gpass.h"
 #include "D3D12Shaders.h"
 #include "D3D12Surface.h"
+#include "D3D12Gpass.h"
 
 
 using namespace Microsoft::WRL;
@@ -83,12 +85,14 @@ namespace ChillEngine::graphics::d3d12::core
             }
             
             //signal the fence with the new fence value
-            void end_frame()
+            void end_frame(const d3d12_surface& surface)
             {
                 //在execute command list前一定要 close commandList
                 DXCall(_cmd_list->Close());
                 ID3D12CommandList* const cmd_lists[] = {_cmd_list};
                 _cmd_queue->ExecuteCommandLists(_countof(cmd_lists), &cmd_lists[0]);
+            
+                surface.present();
 
                 u64& fence_value = _fence_value;
                 ++fence_value;
@@ -169,6 +173,8 @@ namespace ChillEngine::graphics::d3d12::core
         IDXGIFactory7*                  dxgi_factory = nullptr;
         d3d12Command                    gfx_command;
         surface_collection              surfaces;
+        d3dx::d3d12_resource_barrier    resource_barriers{};
+        
         descriptor_heap                 rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//渲染目标视图资源 render target view
         descriptor_heap                 srv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//着色器视图 shader resource view
         descriptor_heap                 uav_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//无需访问视图 unordered access view
@@ -332,6 +338,8 @@ namespace ChillEngine::graphics::d3d12::core
 
         //initialize shader module.
         if(!shaders::initialize()) return failed_init();
+        //gpass module 
+        if(!gpass::initialize()) return failed_init();
 
         return true;
     }
@@ -348,7 +356,18 @@ namespace ChillEngine::graphics::d3d12::core
 
         //shut down module
         shaders::shutdown();
+        gpass::shutdown();
+        
         release(dxgi_factory);
+
+
+        //todo: what the fuck you are doing....
+        // NOTE: some modules free their descriptors when they shutdown.
+        //       We process those by calling process_deferred_free once more.
+        rtv_desc_heap.process_deferred_free(0);
+        dsv_desc_heap.process_deferred_free(0);
+        srv_desc_heap.process_deferred_free(0);
+        uav_desc_heap.process_deferred_free(0);
         
         rtv_desc_heap.release();
         dsv_desc_heap.release();
@@ -459,17 +478,42 @@ namespace ChillEngine::graphics::d3d12::core
             process_deferred_releases(frame_idx);
         }
 
-        const d3d12_surface& surface = surfaces[id];
-
         
-        //presenting swap chain buffers happens in lockstep with frame buffers.
-        surface.present();
+        const d3d12_surface& surface = surfaces[id];
+        ID3D12Resource *const current_back_buffer = surface.back_buffer();
+        
+        d3d12_frame_info frame_info{surface.width(), surface.height()};
+        gpass::set_size({frame_info.surface_width, frame_info.surface_height});
+
+        d3dx::d3d12_resource_barrier& barriers = resource_barriers;
+        
 
         //2.record commands
+        cmd_list->RSSetViewports(1, &surface.viewport());
+        cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
+        //depth prepass
+        gpass::add_transitions_for_depth_prepass(barriers);
+        barriers.apply(cmd_list);
+        gpass::set_render_targets_for_depth_prepass(cmd_list);
+        gpass::depth_prepass(cmd_list, frame_info);
         
+        //geometry and lighting pass
+        gpass::add_transitions_for_gpass(barriers);
+        barriers.apply(cmd_list);
+        gpass::set_render_targets_for_gpass(cmd_list);
+        gpass::render(cmd_list, frame_info);
+
+        d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+        //post-processing
+        gpass::add_transitions_for_post_process(barriers);
+        barriers.apply(cmd_list);
+        //will write to the current back buffer, so back buffer is a render target.
+
+        //after process
+        d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
         //3.Done recording commands. ExecuteCommands now.
         //signal and increment the fence for next frame.
-        gfx_command.end_frame();
+        gfx_command.end_frame(surface);
     }
 
     descriptor_heap& rtv_heap()

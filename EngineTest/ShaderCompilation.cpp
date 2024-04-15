@@ -135,7 +135,7 @@ namespace
             return shader.Detach();
         }
     private:
-        const char* _profile_strings[shader_type::count]{ "vs_6_5", "hs_6_5", "ds_6_5", "gs_6_5", "ps_6_5", "cs_6_5", "as_6_5", "ms_6_5" };
+        constexpr static const char* _profile_strings[]{ "vs_6_5", "hs_6_5", "ds_6_5", "gs_6_5", "ps_6_5", "cs_6_5", "as_6_5", "ms_6_5" };
         static_assert(_countof(_profile_strings) == shader_type::count);
         
         ComPtr<IDxcCompiler3>       _compiler;
@@ -226,7 +226,7 @@ bool compile_shaders()
         full_path = std::filesystem::absolute(path);
         if (!std::filesystem::exists(full_path)) return false;
         ComPtr<IDxcBlob> compiled_shader{ compiler.compile(info, full_path) };
-        if (compiled_shader->GetBufferPointer() && compiled_shader->GetBufferSize())
+        if (compiled_shader && compiled_shader->GetBufferPointer() && compiled_shader->GetBufferSize())
         {
             shaders.emplace_back(std::move(compiled_shader));
         }
