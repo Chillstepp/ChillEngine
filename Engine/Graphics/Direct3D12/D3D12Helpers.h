@@ -171,7 +171,8 @@ private:
     {
         //D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND的话表示该Descriptor Range紧跟着上一个Range
         constexpr explicit d3d12_descriptor_range(D3D12_DESCRIPTOR_RANGE_TYPE range_type, u32 descriptor_count, u32 shader_register, u32 register_space = 0, D3D12_DESCRIPTOR_RANGE_FLAGS flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
-            u32 offset_from_table_start = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND) : D3D12_DESCRIPTOR_RANGE1(range_type, descriptor_count, shader_register, register_space, flags, offset_from_table_start)
+            u32 offset_from_table_start = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND) :
+        D3D12_DESCRIPTOR_RANGE1(range_type, descriptor_count, shader_register, register_space, flags, offset_from_table_start)
         {
             
         }

@@ -6,6 +6,14 @@ namespace ChillEngine::graphics::d3d12::gpass
 {
     namespace
     {
+        struct gpass_root_param_indices
+        {
+            enum : u32 {
+                root_constants,
+                count
+            };
+        };
+        
         constexpr DXGI_FORMAT       main_buffer_format = DXGI_FORMAT_R16G16B16A16_FLOAT;
         constexpr DXGI_FORMAT       depth_buffer_format = DXGI_FORMAT_D32_FLOAT;
         constexpr math::u32v2       initial_dimensions{100, 100};
@@ -44,7 +52,7 @@ namespace ChillEngine::graphics::d3d12::gpass
             {
                 d3d12_texture_init_info info{};
                 info.desc = &desc;
-                info.initial_state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+                info.initial_state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;//像素着色器通过着色器资源视图读取资源之前，资源必须处于此状态。这是只读状态
                 info.clear_value.Format = desc.Format;
                 memcpy(&info.clear_value.Color, &clear_value[0], sizeof(clear_value));
                 gpass_main_buffer = d3d12_render_texture(info);
@@ -76,9 +84,10 @@ namespace ChillEngine::graphics::d3d12::gpass
             assert(!gpass_root_sig && !gpass_pso);
 
             // Create GPass root signature
-            d3dx::d3d12_root_parameter parameters[1]{};
-            parameters[0].as_constants(1, D3D12_SHADER_VISIBILITY_PIXEL, 1);
-            const d3dx::d3d12_root_signature_desc root_signature{ &parameters[0], _countof(parameters) };
+            using idx = gpass_root_param_indices;
+            d3dx::d3d12_root_parameter parameters[idx::count]{};
+            parameters[0].as_constants(3, D3D12_SHADER_VISIBILITY_PIXEL, 1);
+            const d3dx::d3d12_root_signature_desc root_signature{ &parameters[0], idx::count };
             gpass_root_sig = root_signature.create();
             assert(gpass_root_sig);
             NAME_D3D12_OBJECT(gpass_root_sig, L"GPass Root Signature");
@@ -120,6 +129,9 @@ namespace ChillEngine::graphics::d3d12::gpass
         gpass_main_buffer.release();
         gpass_depth_buffer.release();
         dimensions = initial_dimensions;
+
+        core::release(gpass_root_sig);
+        core::release(gpass_pso);
     }
 
     void set_size(math::u32v2 size)
@@ -138,24 +150,35 @@ namespace ChillEngine::graphics::d3d12::gpass
     }
     void render(ID3D12GraphicsCommandList6* cmd_list, const d3d12_frame_info& info)
     {
-    
+        
         cmd_list->SetGraphicsRootSignature(gpass_root_sig);
         cmd_list->SetPipelineState(gpass_pso);
 
         static u32 frame{ 0 };
         ++frame;
-        cmd_list->SetGraphicsRoot32BitConstant(0, frame, 0);
+        struct
+        {
+            f32 width;
+            f32 height;
+            u32 frame;
+        }constants {(f32)info.surface_width, (f32)info.surface_height, frame};
 
+        using idx = gpass_root_param_indices;
+        //把当前是第几帧这个数据加入到我们刚刚创建的gpass_root_sig的第一个参数
+        cmd_list->SetGraphicsRoot32BitConstants(idx::root_constants, 3, &constants, 0);
+
+        //Interpret the vertex data as a list of triangles.
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmd_list->DrawInstanced(3, 1, 0, 0);
     }
 
+    //我们这里要写入深度了，要加上状态
     void add_transitions_for_depth_prepass(d3dx::d3d12_resource_barrier& barriers)
     {
         barriers.add(gpass_depth_buffer.resource(), D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
             D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
-
+    //深度buffer状态恢复回去，mainbuffer从只读，转为写。
     void add_transitions_for_gpass(d3dx::d3d12_resource_barrier& barriers)
     {
         barriers.add(gpass_main_buffer.resource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -167,6 +190,7 @@ namespace ChillEngine::graphics::d3d12::gpass
         barriers.add(gpass_main_buffer.resource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     }
 
+    //渲染深度
     void set_render_targets_for_depth_prepass(ID3D12GraphicsCommandList6* cmd_list)
     {
         const D3D12_CPU_DESCRIPTOR_HANDLE dsv = gpass_depth_buffer.dsv();
@@ -182,5 +206,14 @@ namespace ChillEngine::graphics::d3d12::gpass
         cmd_list->OMSetRenderTargets(1, &rtv, 0, &dsv);
     }
 
+    const d3d12_render_texture& main_buffer()
+    {
+        return gpass_main_buffer;
+    }
+
+    const d3d12_depth_buffer& depth_buffer()
+    {
+        return gpass_depth_buffer;
+    }
     
 }

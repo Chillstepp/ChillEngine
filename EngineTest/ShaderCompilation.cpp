@@ -31,6 +31,7 @@ namespace
     {
         {"FullScreenTriangle.hlsl", "FullScreenTriangleVS", engine_shader::fullscreen_triangle_vs, shader_type::vertex},
         {"FillColor.hlsl", "FillColorPS", engine_shader::fill_color_ps, shader_type::pixel},
+        {"PostProcess.hlsl", "PostProcessPS", engine_shader::post_process_ps,  shader_type::pixel}
     };
 
     static_assert(_countof(shader_files) == engine_shader::count);
@@ -71,6 +72,7 @@ namespace
             std::wstring file{ to_wstring(info.file) };
             std::wstring func{ to_wstring(info.function) };
             std::wstring prof{ to_wstring(_profile_strings[(u32)info.type]) };
+            std::wstring inc { to_wstring(shaders_source_path)};
 
             //compile parameter
             LPCWSTR args[]
@@ -78,6 +80,7 @@ namespace
                 file.c_str(),                       // Optional shader source file name for error reporting
                 L"-E", func.c_str(),                // Entry function
                 L"-T", prof.c_str(),                // Target profile
+                L"-I", inc.c_str(),                 //include path
                 DXC_ARG_ALL_RESOURCES_BOUND,
     #if _DEBUG
                 DXC_ARG_DEBUG,
@@ -151,6 +154,7 @@ namespace
     
     bool compiled_shaders_are_up_to_date()
     {
+        //return false;
         auto engine_shaders_path = get_engine_shaders_path();
         if (!std::filesystem::exists(engine_shaders_path)) return false;
         auto shaders_compilation_time = std::filesystem::last_write_time(engine_shaders_path);

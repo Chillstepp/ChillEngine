@@ -22,6 +22,11 @@ namespace ChillEngine::graphics::d3d12::gpass
 
     void set_render_targets_for_depth_prepass(ID3D12GraphicsCommandList6* cmd_list);
     void set_render_targets_for_gpass(ID3D12GraphicsCommandList6* cmd_list);
+
+    const d3d12_render_texture& main_buffer();
+
+    const d3d12_depth_buffer& depth_buffer();
+
 }
 
 

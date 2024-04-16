@@ -1,9 +1,8 @@
 #include "D3D12Core.h"
-
+#include "D3D12PostProcess.h"
 #include "D3D12Gpass.h"
 #include "D3D12Shaders.h"
 #include "D3D12Surface.h"
-#include "D3D12Gpass.h"
 
 
 using namespace Microsoft::WRL;
@@ -340,6 +339,8 @@ namespace ChillEngine::graphics::d3d12::core
         if(!shaders::initialize()) return failed_init();
         //gpass module 
         if(!gpass::initialize()) return failed_init();
+        //Post-Process
+        if(!fx::initialize()) return failed_init();
 
         return true;
     }
@@ -355,8 +356,10 @@ namespace ChillEngine::graphics::d3d12::core
         }
 
         //shut down module
-        shaders::shutdown();
+        fx::shutdown();
         gpass::shutdown();
+        shaders::shutdown();
+        
         
         release(dxgi_factory);
 
@@ -489,6 +492,9 @@ namespace ChillEngine::graphics::d3d12::core
         
 
         //2.record commands
+        ID3D12DescriptorHeap *const heaps[]{srv_desc_heap.heap()};
+        cmd_list->SetDescriptorHeaps(1, &heaps[0]);
+        
         cmd_list->RSSetViewports(1, &surface.viewport());
         cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
         //depth prepass
@@ -508,7 +514,7 @@ namespace ChillEngine::graphics::d3d12::core
         gpass::add_transitions_for_post_process(barriers);
         barriers.apply(cmd_list);
         //will write to the current back buffer, so back buffer is a render target.
-
+        fx::post_process(cmd_list, surface.rtv());
         //after process
         d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
         //3.Done recording commands. ExecuteCommands now.

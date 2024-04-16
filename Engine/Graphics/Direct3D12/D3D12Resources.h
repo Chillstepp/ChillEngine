@@ -10,13 +10,14 @@ namespace ChillEngine::graphics::d3d12
     {
         D3D12_CPU_DESCRIPTOR_HANDLE         cpu{};
         D3D12_GPU_DESCRIPTOR_HANDLE         gpu{};
+        u32                                 index = u32_invalid_id;
         constexpr bool is_valid() const {return cpu.ptr != 0;}
         constexpr bool is_shader_visible() const {return gpu.ptr != 0;}
 #ifdef _DEBUG
     private:
         friend class descriptor_heap;
         descriptor_heap*    container = nullptr;
-        u32                 index = u32_invalid_id;
+
 #endif
     };
     

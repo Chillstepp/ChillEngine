@@ -13,7 +13,10 @@ using namespace ChillEngine;
 graphics::render_surface _surface[4];
 time_it timer{};
 
+bool is_restarting = false;
 void destroy_render_surface(graphics::render_surface& surface);
+bool test_initialize();
+void test_shutdown();
 
 
 LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -38,7 +41,7 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
                 }
 
             }
-            if (all_closed)
+            if (all_closed && !is_restarting)
             {
                 PostQuitMessage(0);
                 return 0;
@@ -60,6 +63,12 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             PostMessage(hwnd, WM_CLOSE, 0, 0);
             return 0;
         }
+        else if(wparam == VK_F11)
+        {
+            is_restarting = true;
+            test_shutdown();
+            test_initialize();
+        }
     }
 
     return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -79,7 +88,7 @@ void destroy_render_surface(graphics::render_surface& surface)
     if(temp.window.is_valid()) platform::remove_window(temp.window.get_id());
 }
 
-bool engine_test::initialize()
+bool test_initialize()
 {
     while (!compile_shaders())
     {
@@ -105,7 +114,25 @@ bool engine_test::initialize()
 
     for (u32 i = 0; i < _countof(_surface); ++i)
         create_render_surface(_surface[i], info[i]);
+
+    is_restarting = false;
     return true;
+}
+
+void test_shutdown()
+{
+    for (u32 i{ 0 }; i < _countof(_surface); ++i)
+    {
+        destroy_render_surface(_surface[i]);
+    }
+    graphics::shutdown();
+}
+
+
+
+bool engine_test::initialize()
+{
+    return test_initialize();
 }
 
 void engine_test::run()
@@ -124,10 +151,6 @@ void engine_test::run()
 
 void engine_test::shutdown()
 {
-    for (u32 i{ 0 }; i < _countof(_surface); ++i)
-    {
-        destroy_render_surface(_surface[i]);
-    }
-    graphics::shutdown();
+    test_shutdown();
 }
 #endif
