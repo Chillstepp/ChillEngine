@@ -492,6 +492,7 @@ namespace ChillEngine::graphics::d3d12::core
         
 
         //2.record commands
+        //我们在创建的时候只对srv初始化为了 shader-visible, 告诉 GPU 渲染管线在哪里查找资源描述符，以便 GPU 可以正确地访问和处理这些资源
         ID3D12DescriptorHeap *const heaps[]{srv_desc_heap.heap()};
         cmd_list->SetDescriptorHeaps(1, &heaps[0]);
         

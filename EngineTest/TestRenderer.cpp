@@ -13,6 +13,7 @@ using namespace ChillEngine;
 graphics::render_surface _surface[4];
 time_it timer{};
 
+bool resized = false;
 bool is_restarting = false;
 void destroy_render_surface(graphics::render_surface& surface);
 bool test_initialize();
@@ -48,6 +49,9 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             }
         }
         break;
+    case WM_SIZE:
+        if(wparam != SIZE_MINIMIZED) resized = true;
+        break;
     case WM_SYSCHAR:
         //alt + enter: full screen
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
@@ -71,6 +75,20 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         }
     }
 
+    if(resized && GetAsyncKeyState(VK_LBUTTON) >= 0)
+    {
+        platform::window win{platform::window_id((id::id_type)GetWindowLongPtr(hwnd, GWLP_USERDATA))};
+        for(u32 i = 0; i < _countof(_surface); ++i)
+        {
+            if(win.get_id() == _surface[i].window.get_id())
+            {
+                _surface[i].surface.resize(win.width(), win.height());
+                resized = false;
+                break;
+            }
+            
+        }
+    }
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
