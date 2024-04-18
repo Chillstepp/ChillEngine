@@ -14,6 +14,15 @@ namespace ChillEngine::graphics::d3d12::d3dx
             0,// UINT CreationNodeMask
             0// UINT VisibleNodeMask
         };
+
+        const D3D12_HEAP_PROPERTIES upload_heap
+        {
+            D3D12_HEAP_TYPE_UPLOAD,// D3D12_HEAP_TYPE Type;
+            D3D12_CPU_PAGE_PROPERTY_UNKNOWN,// D3D12_CPU_PAGE_PROPERTY CPUPageProperty;
+            D3D12_MEMORY_POOL_UNKNOWN, // D3D12_MEMORY_POOL MemoryPoolPreference;
+            0,// UINT CreationNodeMask
+            0// UINT VisibleNodeMask
+        };
     }heap_properties;
 
     
@@ -293,5 +302,8 @@ PSS(ms, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_MS, D3D12_SHADER_BYTECODE);
     ID3D12PipelineState* create_pipeline_state(D3D12_PIPELINE_STATE_STREAM_DESC desc);
     ID3D12PipelineState* create_pipeline_state(void* stream, u64 stream_size);
 
-    
+    ID3D12Resource* create_buffer(void* data, u32 buffer_size, bool is_cpu_accessible = false,
+        D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE,
+        ID3D12Heap* heap = nullptr, u64 heap_offset = 0);
 }

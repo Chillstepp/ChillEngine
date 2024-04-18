@@ -42,7 +42,7 @@ The engine contains four basic modules.
 
 - `d3dx12.h` like helper function/struct.
 
-- Use **Split Barrier** help to improve performance, especially in multi-engine scenarios or where resources are read/write transitioned sparsely throughout one or more command lists.
+- Use **Split Barrier** help to improve performance, especially in multi-engine scenarios or where resources are read/write transitioned sparsely throughout one or more command lists.  [Reference: Split Barriers](https://learn.microsoft.com/en-us/windows/win32/direct3d12/using-resource-barriers-to-synchronize-resource-states-in-direct3d-12#split-barriers)
 
 - 
 

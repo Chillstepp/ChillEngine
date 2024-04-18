@@ -3,6 +3,7 @@
 #include "D3D12Gpass.h"
 #include "D3D12Shaders.h"
 #include "D3D12Surface.h"
+#include "D3D12Upload.h"
 
 
 using namespace Microsoft::WRL;
@@ -346,6 +347,8 @@ namespace ChillEngine::graphics::d3d12::core
         if(!gpass::initialize()) return failed_init();
         //Post-Process
         if(!fx::initialize()) return failed_init();
+        //Upload context
+        if(!upload::initialize()) return failed_init();
 
         return true;
     }
@@ -361,6 +364,7 @@ namespace ChillEngine::graphics::d3d12::core
         }
 
         //shut down module
+        upload::shutdown();
         fx::shutdown();
         gpass::shutdown();
         shaders::shutdown();
