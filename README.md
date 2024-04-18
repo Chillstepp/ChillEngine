@@ -40,7 +40,9 @@ The engine contains four basic modules.
 
 ### DX12 Wrapper
 
-- d3dx12.h like helper function/struct.
+- `d3dx12.h` like helper function/struct.
+
+- Use **Split Barrier** help to improve performance, especially in multi-engine scenarios or where resources are read/write transitioned sparsely throughout one or more command lists.
 
 - 
 
