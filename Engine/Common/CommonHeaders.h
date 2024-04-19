@@ -40,4 +40,6 @@ T& operator=(T&&) = delete;
 #include "PrimitiveTypes.h"
 #include "../Utilities/MathTypes.h"
 #include "../Utilities/Utilities.h"
+#include "../Utilities/IOStream.h"
+#include "../Utilities/Math.h"
 #include "Id.h"
