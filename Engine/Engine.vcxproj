@@ -42,6 +42,7 @@
     <ClInclude Include="Components\Entity.h" />
     <ClInclude Include="Components\Script.h" />
     <ClInclude Include="Content\ContentLoader.h" />
+    <ClInclude Include="Content\ContentToEngine.h" />
     <ClInclude Include="EngineAPI\GameEntity.h" />
     <ClInclude Include="EngineAPI\ScriptComponent.h" />
     <ClInclude Include="EngineAPI\TransformComponent.h" />
