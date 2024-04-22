@@ -1,4 +1,7 @@
 #pragma once
+#include "../Common/CommonHeaders.h"
+#include "Render.h"
+
 
 namespace ChillEngine::graphics
 {
@@ -17,6 +20,19 @@ namespace ChillEngine::graphics
             u32(*height)(surface_id);
             void(*render)(surface_id);
         } surface;
+        
+
+        struct {
+            id::id_type (*add_submesh)(const u8*&);
+            void (*remove_submesh)(id::id_type);
+        } resources;
+
+        struct {
+            camera(*create)(camera_init_info);
+            void(*remove)(camera_id);
+            void(*set_parameter)(camera_id, camera_parameter::parameter, const void *const, u32);
+            void(*get_parameter)(camera_id, camera_parameter::parameter, void *const, u32);
+        } camera;
 
         graphics_platform platform = static_cast<graphics_platform>(-1);
     };

@@ -3,6 +3,7 @@
 #include "D3D12Core.h"
 #include "../GraphicsPlatformInterface.h"
 #include "../../Common/CommonHeaders.h"
+#include "D3D12Content.h"
 
 namespace ChillEngine::graphics::d3d12
 {
@@ -19,6 +20,11 @@ namespace ChillEngine::graphics::d3d12
         pi.surface.render = core::render_surface;
         pi.surface.width = core::surface_width;
         pi.surface.resize = core::resize_surface;
+
+        pi.resources.add_submesh = content::submesh::add;
+        pi.resources.remove_submesh = content::submesh::remove;
+
+        
     }
 
 }

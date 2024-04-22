@@ -9,7 +9,7 @@ namespace ChillEngine::graphics::d3d12::upload
     public:
         DISABLE_COPY_AND_MOVE(d3d12_upload_context);
         d3d12_upload_context(u32 aligned_size);
-        ~d3d12_upload_context() {}
+        ~d3d12_upload_context() {assert(_frame_index == u32_invalid_id); }
         void end_upload();
 
         constexpr ID3D12GraphicsCommandList6* const command_list() const {return _cmd_list;}

@@ -87,6 +87,8 @@ namespace ChillEngine::graphics::d3d12::upload
 
     d3d12_upload_context::d3d12_upload_context(u32 aligned_size)
     {
+        assert(upload_cmd_queue);
+        
         {
             std::lock_guard lock {frame_mutex};
             _frame_index = get_available_upload_frame();
