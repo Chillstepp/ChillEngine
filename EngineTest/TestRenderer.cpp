@@ -1,4 +1,5 @@
 ﻿#include "Test.h"
+#include "../Engine/Components/Entity.h"
 #include "../Engine/Graphics/Direct3D12/D3D12Core.h"
 #if TEST_RENDERER
 #include "TestRenderer.h"
@@ -9,6 +10,10 @@
 
 
 using namespace ChillEngine;
+
+game_entity::entity entity{};
+id::id_type model_id { id::invalid_id};
+graphics::camera camera{};
 
 graphics::render_surface _surface[4];
 time_it timer{};

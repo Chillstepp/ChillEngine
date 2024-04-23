@@ -42,6 +42,7 @@
     <ClInclude Include="Components\Entity.h" />
     <ClInclude Include="Components\Script.h" />
     <ClInclude Include="Content\ContentLoader.h" />
+    <ClInclude Include="Content\ContentToEngine.h" />
     <ClInclude Include="EngineAPI\Camera.h" />
     <ClInclude Include="EngineAPI\GameEntity.h" />
     <ClInclude Include="EngineAPI\ScriptComponent.h" />
@@ -75,6 +76,7 @@
     <ClCompile Include="Components\Script.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
     <ClCompile Include="Content\ContentLoader.cpp" />
+    <ClCompile Include="Content\ContentToEngine.cpp" />
     <ClCompile Include="Core\Main.cpp" />
     <ClCompile Include="Graphics\Direct3D12\D3D12Camera.cpp" />
     <ClCompile Include="Graphics\Direct3D12\D3D12Content.cpp" />
