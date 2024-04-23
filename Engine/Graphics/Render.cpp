@@ -242,4 +242,5 @@ namespace ChillEngine::graphics
         gfx.camera.get_parameter(_id, camera_parameter::entity_id, &entity_id, sizeof(entity_id));
         return entity_id;
     }
+    
 }
