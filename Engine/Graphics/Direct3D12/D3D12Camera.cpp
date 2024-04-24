@@ -319,21 +319,18 @@ namespace ChillEngine::graphics::d3d12::camera {
         _is_dirty = true;
     }
 
-    graphics::camera
-    create(camera_init_info info)
+    graphics::camera create(camera_init_info info)
     {
         return graphics::camera{ camera_id{ cameras.add(info) } };
     }
 
-    void
-    remove(camera_id id)
+    void remove(camera_id id)
     {
         assert(id::is_valid(id));
         cameras.remove(id);
     }
 
-    void
-    set_parameter(camera_id id, camera_parameter::parameter parameter, const void *const data, u32 data_size)
+    void set_parameter(camera_id id, camera_parameter::parameter parameter, const void *const data, u32 data_size)
     {
         assert(data && data_size);
         assert(parameter < camera_parameter::count);
@@ -341,8 +338,7 @@ namespace ChillEngine::graphics::d3d12::camera {
         set_functions[parameter](camera, data, data_size);
     }
 
-    void
-    get_parameter(camera_id id, camera_parameter::parameter parameter, void *const data, u32 data_size)
+    void get_parameter(camera_id id, camera_parameter::parameter parameter, void *const data, u32 data_size)
     {
         assert(data && data_size);
         assert(parameter < camera_parameter::count);
@@ -350,8 +346,7 @@ namespace ChillEngine::graphics::d3d12::camera {
         get_functions[parameter](camera, data, data_size);
     }
 
-    d3d12_camera&
-    get(camera_id id)
+    d3d12_camera& get(camera_id id)
     {
         assert(id::is_valid(id));
         return cameras[id];

@@ -71,7 +71,7 @@ namespace ChillEngine::graphics {
         f32 near_z;
         f32 far_z;
     };
-
+    
     struct perspective_camera_init_info : public  camera_init_info
     {
         explicit perspective_camera_init_info(id::id_type id)
@@ -107,6 +107,19 @@ namespace ChillEngine::graphics {
     {
         direct3d12=0,
         vulkan = 1
+    };
+
+    struct primitive_topology
+    {
+        enum type: u32{
+            point_list = 1,
+            line_list,
+            line_strip,
+            triangle_list,
+            triangle_strip,
+
+            count
+        };
     };
         
     bool initialize(graphics_platform platform);

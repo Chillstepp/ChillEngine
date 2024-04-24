@@ -1,6 +1,11 @@
-﻿#include "Test.h"
+﻿
+#include "Test.h"
 #include "../Engine/Components/Entity.h"
 #include "../Engine/Graphics/Direct3D12/D3D12Core.h"
+#include "../Engine/Content/ContentToEngine.h"
+#include "../Engine/Components/Transform.h"
+#include <filesystem>
+#include <fstream>
 #if TEST_RENDERER
 #include "TestRenderer.h"
 #include "../Engine/Platform/PlatformTypes.h"
@@ -9,11 +14,54 @@
 #include "ShaderCompilation.h"
 
 
+
 using namespace ChillEngine;
 
-game_entity::entity entity{};
-id::id_type model_id { id::invalid_id};
-graphics::camera camera{};
+/*——————————————————————————————MultiThreading test worker spawn code——————————————————————————————*/
+#define ENABLE_TEST_WORKER 0
+constexpr u32   num_threads = 8;
+bool            bShutdown = false;
+std::thread     workers[num_threads];
+
+
+//test for upload context
+utl::vector<u8> buffer(1024 * 1024, 0);
+void buffer_test_worker()
+{
+    while(!bShutdown)
+    {
+        auto* resource = graphics::d3d12::d3dx::create_buffer(buffer.data(), buffer.size());
+        graphics::d3d12::core::deferred_release(resource);
+    }
+}
+
+template<class FnPtr, class... Args>
+void init_test_workers(FnPtr&& fnPtr, Args&&... args)
+{
+#if ENABLE_TEST_WORKER
+    bShutdown = false;
+    for(auto& w: workers)
+    {
+        w = std::thread(std::forward<FnPtr>(fnPtr), std::forward<Args>(args)...);
+    }
+#endif
+}
+
+void joint_test_workers()
+{
+#if ENABLE_TEST_WORKER
+    bShutdown = true;
+    for(auto& w : workers) w.join();
+#endif
+    
+}
+
+struct {
+    game_entity::entity entity{};
+    graphics::camera camera{};
+}camera;
+id::id_type model_id = id::invalid_id;
+id::id_type item_id = id::invalid_id;
 
 graphics::render_surface _surface[4];
 time_it timer{};
@@ -23,6 +71,8 @@ bool is_restarting = false;
 void destroy_render_surface(graphics::render_surface& surface);
 bool test_initialize();
 void test_shutdown();
+id::id_type create_render_item(id::id_type entity_id);
+void destroy_render_item(id::id_type item_id);
 
 
 LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -97,6 +147,22 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+game_entity::entity create_one_game_entity()
+{
+    transform::init_info transform_info{};
+    math::v3a rot{ 0, 3.14f, 0 };
+    DirectX::XMVECTOR quat{ DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&rot)) };
+    math::v4a rot_quat;
+    DirectX::XMStoreFloat4A(&rot_quat, quat);
+    memcpy(&transform_info.rotation[0], &rot_quat.x, sizeof(transform_info.rotation));
+
+    game_entity::entity_info entity_info{};
+    entity_info.transform = &transform_info;
+    game_entity::entity ntt{ game_entity::create(entity_info) };
+    assert(ntt.is_valid());
+    return ntt;
+}
+
 void create_render_surface(graphics::render_surface& surface, platform::window_init_info info)
 {
     surface.window = platform::create_window(&info);
@@ -110,6 +176,27 @@ void destroy_render_surface(graphics::render_surface& surface)
     if(temp.surface.is_valid()) graphics::remove_surface(temp.surface.get_id());
     if(temp.window.is_valid()) platform::remove_window(temp.window.get_id());
 }
+
+bool
+read_file(std::filesystem::path path, std::unique_ptr<u8[]>& data, u64& size)
+{
+    if (!std::filesystem::exists(path)) return false;
+
+    size = std::filesystem::file_size(path);
+    assert(size);
+    if (!size) return false;
+    data = std::make_unique<u8[]>(size);
+    std::ifstream file{ path, std::ios::in | std::ios::binary };
+    if (!file || !file.read((char*)data.get(), size))
+    {
+        file.close();
+        return false;
+    }
+
+    file.close();
+    return true;
+}
+
 
 bool test_initialize()
 {
@@ -138,12 +225,44 @@ bool test_initialize()
     for (u32 i = 0; i < _countof(_surface); ++i)
         create_render_surface(_surface[i], info[i]);
 
+    //load test model
+    std::unique_ptr<u8[]> model;
+    u64 size{0};
+    if(!read_file("..\\EngineTest\\model.model", model, size))
+    {
+        return false;
+    }
+    model_id = content::create_resource(model.get(), content::asset_type::mesh);
+    if(!id::is_valid(model_id)) return false;
+    
+    //test 多线程提交命令
+    init_test_workers(buffer_test_worker);
+
+    camera.entity = create_one_game_entity();
+    camera.camera = graphics::create_camera(graphics::perspective_camera_init_info(camera.entity.get_id()));
+
+    //item_id = create_render_item(create_one_game_entity().get_id());
+    
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+
+    destroy_render_item(item_id);
+    if (camera.camera.is_valid())
+    {
+        graphics::remove_camera(camera.camera.get_id());
+    }
+
+    if (camera.entity.is_valid())
+    {
+        game_entity::remove(camera.entity.get_id());
+    }
+    //test 多线程提交命令
+    joint_test_workers();
+    
     for (u32 i{ 0 }; i < _countof(_surface); ++i)
     {
         destroy_render_surface(_surface[i]);
@@ -174,6 +293,10 @@ void engine_test::run()
 
 void engine_test::shutdown()
 {
+    if(id::is_valid(model_id))
+    {
+        content::destroy_resource(model_id, content::asset_type::mesh);
+    }
     test_shutdown();
 }
 #endif

@@ -5,6 +5,14 @@
 #include "D3D12Surface.h"
 #include "D3D12Upload.h"
 
+//Since we want to use ShaderModel 6.6, but it seems not support in win10, so we use this method which is given by:
+//https://devblogs.microsoft.com/directx/gettingstarted-dx12agility
+/*
+ * 1. install nuget package of D3D12 Agility SDK
+ * 2. the following code
+ */
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 606; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
 using namespace Microsoft::WRL;
 

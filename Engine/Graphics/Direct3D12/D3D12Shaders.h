@@ -5,23 +5,7 @@
 
 namespace ChillEngine::graphics::d3d12::shaders
 {
-    struct shader_type
-    {
-        enum type : u32
-        {
-            vertex = 0,
-            hull,
-            domain,
-            geometry,
-            pixel,
-            compute,
-            amplification,
-            mesh,
-            
-            count
-        };
-    };
-    
+
     //EngineShader is the shader use by engine and will not be changed frequently.
     struct engine_shader
     {

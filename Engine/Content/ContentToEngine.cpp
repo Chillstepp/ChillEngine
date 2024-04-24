@@ -64,9 +64,12 @@ namespace ChillEngine::content
             u32             _lod_count;
         };
 
-        
-        utl::free_list<u8*> geometry_hierarchies;
-        std::mutex geometry_mutex;
+        constexpr uintptr_t         single_mesh_marker{ (uintptr_t)0x01 };
+        utl::free_list<u8*>         geometry_hierarchies;
+        std::mutex                  geometry_mutex;
+
+        utl::free_list<std::unique_ptr<u8[]>>   shaders;
+        std::mutex                              shader_mutex;
 
         // NOTE: expects the same data as create_geometry_resource()
         //拿到geometry hierarchy的buffer大小: 
@@ -158,6 +161,32 @@ namespace ChillEngine::content
             std::lock_guard lock{ geometry_mutex };
             return geometry_hierarchies.add(fake_pointer);
         }
+
+        // Determine if this geometry has a single lod with a single submesh
+        // NOTE: expects the same data as create_geometry_resource()
+        bool is_single_mesh(const void *const data)
+        {
+            assert(data);
+            utl::blob_stream_reader blob{ (const u8*)data };
+            const u32 lod_count{ blob.read<u32>() };
+            assert(lod_count);
+            if (lod_count > 1) return false;
+
+            // skip over threshold
+            blob.skip(sizeof(f32));
+            const u32 submesh_count{ blob.read<u32>() };
+            assert(submesh_count);
+            return submesh_count == 1;
+        }
+
+        id::id_type gpu_id_from_fake_pointer(u8 *const pointer)
+        {
+            assert((uintptr_t)pointer & single_mesh_marker);
+            static_assert(sizeof(uintptr_t) > sizeof(id::id_type));
+            constexpr u8 shift_bits{ (sizeof(uintptr_t) - sizeof(id::id_type)) << 3 };
+            return (((uintptr_t)pointer) >> shift_bits) & (uintptr_t)id::invalid_id;
+        }
+
         
         /* Data contains:
          * struct{
@@ -265,5 +294,29 @@ namespace ChillEngine::content
             assert(false);
             break;
         }
+    }
+
+    id::id_type add_shader(const u8* data)
+    {
+        const compiled_shader_ptr shader_ptr{ (const compiled_shader_ptr)data };
+        const u64 size{sizeof(u64) + compiled_shader::hash_length + shader_ptr->byte_code_size()};
+        std::unique_ptr<u8[]> shader{std::make_unique<u8[]>(size)};
+        memcpy(shader.get(), data, size);
+        std::lock_guard lock{shader_mutex};
+        return shaders.add(std::move(shader));
+    }
+
+    void remove_shader(id::id_type id)
+    {
+        std::lock_guard lock{shader_mutex};
+        assert(id::is_valid(id));
+        shaders.remove(id);
+    }
+
+    compiled_shader_ptr get_shader(id::id_type id)
+    {
+        std::lock_guard lock{shader_mutex};
+        assert(id::is_valid(id));
+        return (const compiled_shader_ptr)(shaders[id].get());
     }
 }
