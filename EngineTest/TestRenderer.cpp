@@ -241,7 +241,7 @@ bool test_initialize()
     camera.entity = create_one_game_entity();
     camera.camera = graphics::create_camera(graphics::perspective_camera_init_info(camera.entity.get_id()));
 
-    //item_id = create_render_item(create_one_game_entity().get_id());
+    item_id = create_render_item(create_one_game_entity().get_id());
     
     is_restarting = false;
     return true;

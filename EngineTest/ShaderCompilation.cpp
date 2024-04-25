@@ -250,6 +250,7 @@ std::unique_ptr<u8[]> compile_shader(shader_file_info info, const char* file_pat
 {
     std::filesystem::path full_path = file_path;
     full_path += info.file_name;
+    auto x = std::filesystem::absolute(full_path);
     if(!std::filesystem::exists(full_path)) return {};
     // NOTE: according to marcelolr (https://github.com/Microsoft/DirectXShaderCompiler/issues/79)
     //       "...creating compiler instances is pretty cheap, so it's probably not worth the hassle of caching / sharing them."

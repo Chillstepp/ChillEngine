@@ -224,13 +224,12 @@ namespace ChillEngine::content
          *   (gpu_id << 32) | 0x01
          */
 
-        id::id_type
-        create_geometry_resource(const void *const data)
+        id::id_type create_geometry_resource(const void *const data)
         {
             assert(data);
             return is_single_mesh(data) ? create_single_submesh(data) : create_mesh_hierarchy(data);
         }
-
+        
         void
         destroy_geometry_resource(id::id_type id)
         {
@@ -258,8 +257,27 @@ namespace ChillEngine::content
 
             geometry_hierarchies.remove(id);
         }
-
         
+        /* Data contains:
+        *      struct material_init_info
+        *        {
+        *           material_type::type type;
+        *           u32                 texture_count;//NOTE: Textures are optional, it can be zero.
+        *           id::id_type         shader_ids[shader_type::count] = {id::invalid_id, id::invalid_id, id::invalid_id, id::invalid_id, id::invalid_id, id::invalid_id, id::invalid_id, id::invalid_id};
+        *           id::id_type*        texture_ids;
+        *           
+        *       };
+        */
+        id::id_type create_material_resource(const void *const data)
+        {
+            assert(data);
+            return graphics::add_material(*(const graphics::material_init_info *const)data);
+        }
+
+        void destroy_material_resource(id::id_type id)
+        {
+            graphics::remove_material(id);
+        }
     }
 
     
@@ -272,7 +290,7 @@ namespace ChillEngine::content
         switch (type)
         {
         case asset_type::animation: break;
-        case asset_type::material: break;
+        case asset_type::material: id = create_material_resource(data); break;
         case asset_type::mesh:  id = create_geometry_resource(data);  break;
         case asset_type::texture: break;
         }
@@ -287,7 +305,7 @@ namespace ChillEngine::content
         switch (type)
         {
         case asset_type::animation: break;
-        case asset_type::material: break;
+        case asset_type::material: destroy_material_resource(id); break;
         case asset_type::mesh:  destroy_geometry_resource(id);  break;
         case asset_type::texture: break;
         default:
