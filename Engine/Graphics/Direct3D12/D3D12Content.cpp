@@ -12,7 +12,7 @@ namespace ChillEngine::graphics::d3d12::content
             D3D12_VERTEX_BUFFER_VIEW        position_buffer_view{};
             D3D12_INDEX_BUFFER_VIEW         index_buffer_view{};
             D3D12_VERTEX_BUFFER_VIEW        element_buffer_view{};
-            u32                             element_type{};
+            u32                             elements_type{};
             D3D_PRIMITIVE_TOPOLOGY          primitive_topology;
         };
 
@@ -327,6 +327,24 @@ namespace ChillEngine::graphics::d3d12::content
             core::deferred_release(submesh_buffers[id]);
             submesh_buffers.remove(id);
         }
+
+        void get_views(const id::id_type* const gpu_ids, u32 id_count, const views_cache& cache)
+        {
+            assert(gpu_ids && id_count);
+            assert(cache.posistion_buffers && cache.element_buffers && cache.index_buffer_views
+                && cache.primitive_topologies && cache.elements_types);
+
+            std::lock_guard lock{ submesh_mutex };
+            for(u32 i = 0; i < id_count; ++i)
+            {
+                const submesh_view& view{submesh_views[gpu_ids[i]]};
+                cache.posistion_buffers[i] = view.position_buffer_view.BufferLocation;
+                cache.element_buffers[i] = view.position_buffer_view.BufferLocation;
+                cache.index_buffer_views[i] = view.index_buffer_view;
+                cache.primitive_topologies[i] = view.primitive_topology;
+                cache.elements_types[i] = view.elements_type;
+            }
+        }
     }
 
     namespace texture
@@ -342,7 +360,6 @@ namespace ChillEngine::graphics::d3d12::content
             }
         }
     }
-    
 
     namespace material
     {
@@ -373,6 +390,17 @@ namespace ChillEngine::graphics::d3d12::content
         {
             std::lock_guard lock{material_mutex};
             materials.remove(id);
+        }
+
+        void get_materials(const id::id_type* const material_ids, u32 material_count, const materials_cache& cache)
+        {
+            assert(material_ids && material_count);
+            assert(cache.material_types && cache.root_signatures);
+            std::lock_guard lock {material_mutex };
+            for(u32 i = 0; i < material_count; ++i)
+            {
+                
+            }
         }
     }
 

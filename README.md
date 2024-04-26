@@ -41,12 +41,20 @@ The engine contains four basic modules.
 ### DX12 Wrapper
 
 - `d3dx12.h` like helper function/struct.
-- Use **Split Barrier** help to improve performance, especially in multi-engine scenarios or where resources are read/write transitioned sparsely throughout one or more command lists.  [Reference: Split Barriers](https://learn.microsoft.com/en-us/windows/win32/direct3d12/using-resource-barriers-to-synchronize-resource-states-in-direct3d-12#split-barriers)
-- Cache-Friendly Mesh Data management.
 
-  - <img src="https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240423221647571.png" alt="image-20240423221647571" style="zoom:50%;" />
+- Use **Split Barrier** help to improve performance, especially in multi-engine scenarios or where resources are read/write transitioned sparsely throughout one or more command lists.  [Reference: Split Barriers](https://learn.microsoft.com/en-us/windows/win32/direct3d12/using-resource-barriers-to-synchronize-resource-states-in-direct3d-12#split-barriers)
+
+- Cache-Friendly
+
+  - Mesh Data management.
+  
+    <img src="https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240423221647571.png" alt="image-20240423221647571" style="zoom:50%;" />
+  
   - ![image-20240423224146519](https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240423224146519.png)
+  
   - ![image-20240426153116980](https://raw.githubusercontent.com/Chillstepp/MyPicBed/master/master/image-20240426153116980.png)
+  
+  - Material cache, Views cache（D3D12Content.h/.cpp）
   
 - Use HLSL Dynamic Resources(Shader Model 6.6 Features).  [Reference](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html)
 
