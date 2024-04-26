@@ -4,6 +4,7 @@
 #include "D3D12Shaders.h"
 #include "D3D12Surface.h"
 #include "D3D12Upload.h"
+#include "D3D12Content.h"
 
 //Since we want to use ShaderModel 6.6, but it seems not support in win10, so we use this method which is given by:
 //https://devblogs.microsoft.com/directx/gettingstarted-dx12agility
@@ -357,6 +358,8 @@ namespace ChillEngine::graphics::d3d12::core
         if(!fx::initialize()) return failed_init();
         //Upload context
         if(!upload::initialize()) return failed_init();
+        //content module
+        if(!content::initialize()) return failed_init();
 
         return true;
     }
@@ -372,6 +375,7 @@ namespace ChillEngine::graphics::d3d12::core
         }
 
         //shut down module
+        content::shutdown();
         upload::shutdown();
         fx::shutdown();
         gpass::shutdown();

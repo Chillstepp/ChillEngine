@@ -5,6 +5,10 @@
 
 namespace ChillEngine::graphics::d3d12::content
 {
+
+    bool initialize();
+    void shutdown();
+    
     namespace submesh
     {
         id::id_type add(const u8*& data);

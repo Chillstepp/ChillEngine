@@ -53,16 +53,16 @@ OutputDebugString(L"::D3D12 object Created");\
 OutputDebugString(name);\
 OutputDebugString(L"\n");
 
-#define NAME_D3D12_OBJECT_Indexed(obj, idx, name)           \
-{                                                           \
-    wchar_t full_name[128];                                 \
-    if(swprintf_s(full_name, L"%s[%u]", name, idx) > 0)     \
-    {                                                       \
-        obj->SetName(full_name);                            \
-        OutputDebugString(L"::D3D12 object Created");       \
-        OutputDebugString(full_name);                       \
-        OutputDebugString(L"\n");                           \
-    }                                                       \
+#define NAME_D3D12_OBJECT_Indexed(obj, idx, name)                   \
+{                                                                   \
+    wchar_t full_name[128];                                         \
+    if(swprintf_s(full_name, L"%s[%llu]", name, (u64)idx) > 0)      \
+    {                                                               \
+        obj->SetName(full_name);                                    \
+        OutputDebugString(L"::D3D12 object Created");               \
+        OutputDebugString(full_name);                               \
+        OutputDebugString(L"\n");                                   \
+    }                                                               \
 }
 #else
 #define NAME_D3D12_OBJECT(obj, name)

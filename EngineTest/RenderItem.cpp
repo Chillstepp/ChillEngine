@@ -79,6 +79,7 @@ id::id_type create_render_item(id::id_type entity_id)
 
         
     // add a render item using the model and its material.
+    create_material();
 
     //@todo : add add_render_item in renderer.
     id::id_type item_id = 0;
@@ -99,6 +100,10 @@ void destroy_render_item(id::id_type item_id)
         }
     }
     // remove material
+    if(id::is_valid(mtl_id))
+    {
+        content::destroy_resource(mtl_id, content::asset_type::material);
+    }
 
     // remove shaders and textures
     if(id::is_valid(vs_id) && id::is_valid(ps_id))

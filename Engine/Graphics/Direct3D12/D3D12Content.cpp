@@ -232,7 +232,22 @@ namespace ChillEngine::graphics::d3d12::content
             return id;
         }
     }
-    
+
+    bool initialize()
+    {
+        return true;
+    }
+
+    void shutdown()
+    {
+        for(auto& item: root_signatures)
+        {
+            core::release(item);
+        }
+        mtl_rootsig_map.clear();
+        root_signatures.clear();
+    }
+
     namespace submesh
     {
         /* Data contains:
@@ -348,6 +363,7 @@ namespace ChillEngine::graphics::d3d12::content
             std::unique_ptr<u8[]> buffer;
             std::lock_guard lock{material_mutex};
             //create material from info
+            d3d12_material_stream stream{buffer, info};
             
             assert(buffer);
             return materials.add(std::move(buffer));

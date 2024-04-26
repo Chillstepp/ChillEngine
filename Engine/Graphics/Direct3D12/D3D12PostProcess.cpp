@@ -13,7 +13,7 @@ namespace ChillEngine::graphics::d3d12::fx
             enum: u32
             {
                 root_constants = 0,
-                descriptor_table = 1,
+                //descriptor_table = 1, dynamic resource don't need it anymore
                 count
             };
         };
@@ -25,19 +25,23 @@ namespace ChillEngine::graphics::d3d12::fx
             assert(!fx_root_sig && !fx_pso);
 
             // Create fx root signature
-            d3dx::d3d12_descriptor_range range
-            {
-                D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-                D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND, 0, 0,
-                D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE
-            };
+            //dynamic resource don't need it anymore
+            // d3dx::d3d12_descriptor_range range
+            // {
+            //     D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+            //     D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND, 0, 0,
+            //     D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE
+            // };
 
             using idx = fx_root_param_indices;
             d3dx::d3d12_root_parameter parameters[idx::count]{};
             parameters[idx::root_constants].as_constants(1, D3D12_SHADER_VISIBILITY_PIXEL, 1);
-            parameters[idx::descriptor_table].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
+
+            //remove info:dynamic resource don't need it anymore
+            //parameters[idx::descriptor_table].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
             
-            const d3dx::d3d12_root_signature_desc root_signature{ &parameters[0], _countof(parameters) };
+            d3dx::d3d12_root_signature_desc root_signature{ &parameters[0], _countof(parameters) };
+            root_signature.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
             fx_root_sig = root_signature.create();
             assert(fx_root_sig);
             NAME_D3D12_OBJECT(fx_root_sig, L"FX Root Signature");
@@ -83,7 +87,8 @@ namespace ChillEngine::graphics::d3d12::fx
 
         using idx = fx_root_param_indices;
         cmd_list->SetGraphicsRoot32BitConstant(idx::root_constants, gpass::main_buffer().srv().index, 0);
-        cmd_list->SetGraphicsRootDescriptorTable(idx::descriptor_table, core::srv_heap().gpu_start());
+        //remove info:dynamic resource don't need it anymore
+        //cmd_list->SetGraphicsRootDescriptorTable(idx::descriptor_table, core::srv_heap().gpu_start());
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmd_list->OMSetRenderTargets(1, &target_rtv, 1, nullptr);
         cmd_list->DrawInstanced(3, 1, 0, 0);
