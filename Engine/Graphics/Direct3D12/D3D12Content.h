@@ -43,4 +43,32 @@ namespace ChillEngine::graphics::d3d12::content
 
         void get_materials(const id::id_type *const material_ids, u32 material_count, const materials_cache& cache);
     }
+
+    namespace render_item 
+    {
+        //all we need to render a submesh
+        struct d3d12_render_item
+        {
+            id::id_type entity_id;
+            id::id_type submesh_gpu_id;
+            id::id_type material_id;
+            id::id_type pso_id;
+            id::id_type depth_pso_id;
+        };
+
+        struct items_cache
+        {
+            id::id_type *const entity_ids;
+            id::id_type *const submesh_gpu_ids;
+            id::id_type *const material_ids;
+            ID3D12PipelineState* *const psos;
+            ID3D12PipelineState* *const depth_psos;
+        };
+
+        id::id_type add(id::id_type entity_id, id::id_type geometry_content_id, u32 material_count, const id::id_type *const material_ids);
+        void remove(id::id_type id);
+        void get_d3d12_render_item_ids(const frame_info& info, utl::vector<id::id_type>& d3d12_render_item_ids);
+        void get_items(const id::id_type *const d3d12_render_item_ids, u32 id_count, const items_cache& cache);
+    }
+    
 }

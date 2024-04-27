@@ -6,6 +6,16 @@
 
 namespace ChillEngine::graphics {
 
+
+    struct frame_info
+    {
+        id::id_type*    render_item_ids{ nullptr };//此帧下要渲染的high-level render item的id.
+        f32*            thresholds{ nullptr };
+        u32             render_item_count{ 0 };//此帧下要渲染的high-level render item数量
+        camera_id       camer_id{ id::invalid_id };
+    };
+
+    
     DEFINE_TYPE_ID(surface_id);
     class surface
     {
