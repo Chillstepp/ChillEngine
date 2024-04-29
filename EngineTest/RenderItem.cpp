@@ -80,9 +80,11 @@ id::id_type create_render_item(id::id_type entity_id)
         
     // add a render item using the model and its material.
     create_material();
+    id::id_type materials[]{mtl_id, mtl_id, mtl_id, mtl_id, mtl_id};
 
-    //@todo : add add_render_item in renderer.
-    id::id_type item_id = 0;
+    //add add_render_item in renderer.
+    id::id_type item_id = graphics::add_render_item(0, model_id, _countof(materials), &materials[0]);
+    
     render_item_entity_map[item_id] = entity_id;
     //end todo.
     return {0};
@@ -93,6 +95,7 @@ void destroy_render_item(id::id_type item_id)
     // remove the render item from engine
     if(id::is_valid(item_id))
     {
+        graphics::remove_render_item(item_id);
         auto pair = render_item_entity_map.find(item_id);
         if(pair != render_item_entity_map.end())
         {

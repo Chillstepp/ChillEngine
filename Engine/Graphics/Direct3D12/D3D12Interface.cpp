@@ -31,6 +31,9 @@ namespace ChillEngine::graphics::d3d12
 
         pi.resources.add_material = content::material::add;
         pi.resources.remove_material = content::material::remove;
+
+        pi.resources.add_render_item = content::render_item::add;
+        pi.resources.remove_render_item = content::render_item::remove;
         
     }
 

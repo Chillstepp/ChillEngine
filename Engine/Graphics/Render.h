@@ -203,4 +203,8 @@ namespace ChillEngine::graphics {
     id::id_type add_material(material_init_info info);
     void remove_material(id::id_type id);
 
+    id::id_type add_render_item(id::id_type entity_id, id::id_type geometry_content_id, u32 material_count, const id::id_type *const material_ids);
+    void remove_render_item(id::id_type id);
+    
+
 }

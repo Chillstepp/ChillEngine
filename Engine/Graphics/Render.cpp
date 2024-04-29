@@ -252,5 +252,15 @@ namespace ChillEngine::graphics
         gfx.camera.get_parameter(_id, camera_parameter::entity_id, &entity_id, sizeof(entity_id));
         return entity_id;
     }
-    
+
+    id::id_type add_render_item(id::id_type entity_id, id::id_type geometry_content_id, u32 material_count,
+        const id::id_type* const material_ids)
+    {
+        return gfx.resources.add_render_item(entity_id, geometry_content_id, material_count, material_ids);
+    }
+
+    void remove_render_item(id::id_type id)
+    {
+        gfx.resources.remove_render_item(id);
+    }
 }

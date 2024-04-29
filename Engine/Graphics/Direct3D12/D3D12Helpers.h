@@ -96,9 +96,58 @@ namespace ChillEngine::graphics::d3d12::d3dx
             {},                                             //BackFace
             0                                               //DepthBoundsTestEnable
         };
+        
+        const D3D12_DEPTH_STENCIL_DESC1 enabled{
+            1,                                              // DepthEnable
+            D3D12_DEPTH_WRITE_MASK_ALL,                     // DepthWriteMask
+            D3D12_COMPARISON_FUNC_LESS_EQUAL,               // DepthFunc
+            0,                                              // StencilEnable
+            0,                                              // StencilReadMask
+            0,                                              // StencilWriteMask
+            {},                                             // FrontFace
+            {},                                             // BackFace
+            0                                               // DepthBoundsTestEnable
+        };
+
+        const D3D12_DEPTH_STENCIL_DESC1 enabled_readonly{
+            1,                                              // DepthEnable
+            D3D12_DEPTH_WRITE_MASK_ZERO,                    // DepthWriteMask
+            D3D12_COMPARISON_FUNC_LESS_EQUAL,               // DepthFunc
+            0,                                              // StencilEnable
+            0,                                              // StencilReadMask
+            0,                                              // StencilWriteMask
+            {},                                             // FrontFace
+            {},                                             // BackFace
+            0                                               // DepthBoundsTestEnable
+        };
+
+        const D3D12_DEPTH_STENCIL_DESC1 reversed{
+            1,                                              // DepthEnable
+            D3D12_DEPTH_WRITE_MASK_ALL,                     // DepthWriteMask
+            D3D12_COMPARISON_FUNC_GREATER_EQUAL,            // DepthFunc
+            0,                                              // StencilEnable
+            0,                                              // StencilReadMask
+            0,                                              // StencilWriteMask
+            {},                                             // FrontFace
+            {},                                             // BackFace
+            0                                               // DepthBoundsTestEnable
+        };
+
+        const D3D12_DEPTH_STENCIL_DESC1 reversed_readonly{
+            1,                                              // DepthEnable
+            D3D12_DEPTH_WRITE_MASK_ZERO,                    // DepthWriteMask
+            D3D12_COMPARISON_FUNC_GREATER_EQUAL,            // DepthFunc, reverse-z use greater, the object close to camera has greater value
+            0,                                              // StencilEnable
+            0,                                              // StencilReadMask
+            0,                                              // StencilWriteMask
+            {},                                             // FrontFace
+            {},                                             // BackFace
+            0                                               // DepthBoundsTestEnable
+        };
     } depth_state;
 
     constexpr struct {
+        //禁用blend，不透明
         const D3D12_BLEND_DESC disabled{
             0,                                              // AlphaToCoverageEnable
             0,                                              // IndependentBlendEnable
@@ -120,6 +169,7 @@ namespace ChillEngine::graphics::d3d12::d3dx
             }
         };
 
+        //透明/半透明
         const D3D12_BLEND_DESC alpha_blend{
             0,                                              // AlphaToCoverageEnable
             0,                                              // IndependentBlendEnable

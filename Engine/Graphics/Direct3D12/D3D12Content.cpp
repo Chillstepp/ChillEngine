@@ -7,6 +7,11 @@ namespace ChillEngine::graphics::d3d12::content
 {
     namespace
     {
+        struct pso_id
+        {
+            id::id_type gpass_pso_id = id::invalid_id;
+            id::id_type depth_pso_id = id::invalid_id;
+        };
         struct submesh_view
         {
             D3D12_VERTEX_BUFFER_VIEW        position_buffer_view{};
@@ -146,7 +151,7 @@ namespace ChillEngine::graphics::d3d12::content
             shader_flags::flags     _shader_flags;
         };
         
-        D3D_PRIMITIVE_TOPOLOGY get_d3d_primitive_topology(primitive_topology::type type)
+        constexpr D3D_PRIMITIVE_TOPOLOGY get_d3d_primitive_topology(primitive_topology::type type)
         {
             using namespace ChillEngine::content;
             assert(type < primitive_topology::count);
@@ -161,6 +166,20 @@ namespace ChillEngine::graphics::d3d12::content
             }
 
             return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+        }
+
+        D3D12_PRIMITIVE_TOPOLOGY_TYPE get_d3d_primitive_topology_type(D3D_PRIMITIVE_TOPOLOGY topology)
+        {
+            switch (topology)
+            {
+            case D3D_PRIMITIVE_TOPOLOGY_POINTLIST: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+            case D3D_PRIMITIVE_TOPOLOGY_LINELIST: 
+            case D3D_PRIMITIVE_TOPOLOGY_LINESTRIP: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+            case D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST: 
+            case D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+            }
+
+            return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
         }
         
         constexpr D3D12_ROOT_SIGNATURE_FLAGS get_root_signature_flags(shader_flags::flags flags)
@@ -242,6 +261,88 @@ namespace ChillEngine::graphics::d3d12::content
             NAME_D3D12_OBJECT_Indexed(root_signature, key, L"GPass Root Signature - key");
 
             return id;
+        }
+
+        //we will find is there any pso that are already created before?
+        //if has, we just return it from pso_map, otherwise we create new one and put it in pso_map
+        //This func is only called by the func that are locked by render_item_mutex, so we don't need to lock it anymore.
+        id::id_type create_pso_if_needed(const u8* const stream_ptr, u64 aligned_stream_size, bool is_depth)
+        {
+            const u64 key = math::calc_crc32_u64(stream_ptr, aligned_stream_size);
+            auto pair = pso_map.find(key);
+
+            id::id_type id = id::invalid_id;
+            if(pair != pso_map.end())
+            {
+                assert(pair->first == key);
+                id = pair->second;
+            }
+            else
+            {
+                id = (u32)pipeline_states.size();
+                d3dx::d3d12_pipeline_state_subobject_stream *const stream { (d3dx::d3d12_pipeline_state_subobject_stream *const)stream_ptr };
+                pipeline_states.emplace_back(d3dx::create_pipeline_state(stream,sizeof(d3dx::d3d12_pipeline_state_subobject_stream)));
+                NAME_D3D12_OBJECT_Indexed(pipeline_states.back(), key, is_depth ? L"Depth-only pipeline state object(pso) - key": L"GPass pipeline state object(pso) - key");
+                pso_map[key] = id;
+            }
+            assert(id::is_valid(id));
+            return id;
+        }
+        
+        pso_id create_pso(id::id_type material_id, D3D_PRIMITIVE_TOPOLOGY primitive_topology, u32 elements_type)
+        {
+            std::lock_guard lock{material_mutex};
+            const d3d12_material_stream material{materials[material_id].get()};
+            //CRC Hash need 8 byte one time integration, so we align it by 8 bytes
+            constexpr u64 aligned_stream_size { math::align_size_up<sizeof(u64)>(sizeof(d3dx::d3d12_pipeline_state_subobject_stream)) };
+            u8 *const stream_ptr{(u8 *const)alloca(aligned_stream_size)};//get memory from [stack]
+            ZeroMemory(stream_ptr, aligned_stream_size);//fill with zero
+            new (stream_ptr) d3dx::d3d12_pipeline_state_subobject_stream{};
+            
+            d3dx::d3d12_pipeline_state_subobject_stream& stream{*(d3dx::d3d12_pipeline_state_subobject_stream *const)stream_ptr};
+            D3D12_RT_FORMAT_ARRAY rt_array{};
+            rt_array.NumRenderTargets = 1;
+            rt_array.RTFormats[0] = gpass::main_buffer_format;
+            stream.render_target_formats = rt_array;
+            stream.root_signature = root_signatures[material.root_signature_id()];
+            stream.primitive_topology = get_d3d_primitive_topology_type(primitive_topology);
+            stream.depth_stencil_format = gpass::depth_buffer_format;
+            stream.rasterizer = d3dx::rasterizer_state.backface_cull;
+            stream.depth_stencil1 = d3dx::depth_state.enabled_readonly;
+            stream.blend = d3dx::blend_state.disabled;
+
+            const shader_flags::flags flags { material.shader_flags() };
+            D3D12_SHADER_BYTECODE shaders[shader_type::count]{};
+            u32 shader_index = 0;
+            for(u32 i = 0; i < shader_type::count; i++)
+            {
+                if(flags & (1 << i))
+                {
+                    ChillEngine::content::compiled_shader_ptr shader{ ChillEngine::content::get_shader(material.shader_ids()[shader_index]) };
+                    assert(shader);
+                    shaders[i].pShaderBytecode = shader->byte_code();
+                    shaders[i].BytecodeLength = shader->byte_code_size();
+                    ++ shader_index;
+                }
+            }
+
+            stream.vs = shaders[shader_type::vertex];
+            stream.ps = shaders[shader_type::pixel];
+            stream.ds = shaders[shader_type::domain];
+            stream.hs = shaders[shader_type::hull];
+            stream.gs = shaders[shader_type::geometry];
+            stream.cs = shaders[shader_type::compute];
+            stream.as = shaders[shader_type::amplification];
+            stream.ms = shaders[shader_type::mesh];
+
+            pso_id id_pair{};
+            id_pair.gpass_pso_id = create_pso_if_needed(stream_ptr, aligned_stream_size, false);
+
+            stream.ps = D3D12_SHADER_BYTECODE{};
+            stream.depth_stencil1 = d3dx::depth_state.enabled;
+            id_pair.depth_pso_id = create_pso_if_needed(stream_ptr, aligned_stream_size, true);
+
+            return id_pair;
         }
     }
 
@@ -465,6 +566,7 @@ namespace ChillEngine::graphics::d3d12::content
                 item.entity_id = entity_id;
                 item.submesh_gpu_id = gpu_ids[i];
                 item.material_id = material_ids[i];
+                
                 pso_id id_pair{ create_pso(item.material_id, views_cache.primitive_topologies[i], views_cache.elements_types[i]) };
                 item.pso_id = id_pair.gpass_pso_id;
                 item.depth_pso_id = id_pair.depth_pso_id;

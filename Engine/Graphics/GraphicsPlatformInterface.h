@@ -28,6 +28,9 @@ namespace ChillEngine::graphics
 
             id::id_type (*add_material)(material_init_info);
             void (*remove_material)(id::id_type);
+
+            id::id_type (*add_render_item)(id::id_type, id::id_type, u32, const id::id_type *const);
+            void (*remove_render_item)(id::id_type);
         } resources;
 
         struct {
@@ -36,6 +39,7 @@ namespace ChillEngine::graphics
             void(*set_parameter)(camera_id, camera_parameter::parameter, const void *const, u32);
             void(*get_parameter)(camera_id, camera_parameter::parameter, void *const, u32);
         } camera;
+        
 
         graphics_platform platform = static_cast<graphics_platform>(-1);
     };
