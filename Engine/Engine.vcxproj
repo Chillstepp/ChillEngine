@@ -60,6 +60,7 @@
     <ClInclude Include="Graphics\Direct3D12\D3D12Shaders.h" />
     <ClInclude Include="Graphics\Direct3D12\D3D12Surface.h" />
     <ClInclude Include="Graphics\Direct3D12\D3D12Upload.h" />
+    <ClInclude Include="Graphics\Direct3D12\Shaders\SharedTypes.h" />
     <ClInclude Include="Graphics\GraphicsPlatformInterface.h" />
     <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Platform\Platform.h" />
@@ -95,9 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Components\Transform.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\Direct3D12\Shaders" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

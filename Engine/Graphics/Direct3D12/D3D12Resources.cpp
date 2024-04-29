@@ -222,4 +222,44 @@ namespace ChillEngine::graphics::d3d12
         core::dsv_heap().free(_dsv);
         _texture.release();
     }
+
+    ////////////////////////////////d3d12 buffer/////////////////////////////
+    d3d12_buffer::d3d12_buffer(d3d12_buffer_init_info info, bool is_cpu_accessible)
+    {
+        assert(!_buffer & info.size && info.alignment);
+        _size = (u32)math::align_size_up(info.size, info.alignment);
+        _buffer = d3dx::create_buffer(info.data, _size, is_cpu_accessible, info.initial_state, info.flags, info.heap, info.allocation_info.Offset);
+        _gpu_address = _buffer->GetGPUVirtualAddress();
+        NAME_D3D12_OBJECT_Indexed(_buffer, _size, L"d3d12 buffer - size");
+    }
+
+    void d3d12_buffer::release()
+    {
+        core::deferred_release(_buffer);
+        _gpu_address = 0;
+        _size = 0;
+    }
+    //////////////////////////////constant buffer////////////////////////////
+    constant_buffer::constant_buffer(d3d12_buffer_init_info info)
+        :_buffer(info, true)
+    {
+        NAME_D3D12_OBJECT_Indexed(buffer(), size(), L"Constant Buffer - size");
+        D3D12_RANGE range{};
+        buffer()->Map(0, &range, (void**)(&_cpu_address));
+        assert(_cpu_address);
+    }
+
+    u8* const constant_buffer::allocate(u32 size)
+    {
+        std::lock_guard lock{_mutex};
+        const u32 alignment_size =  (u32)d3dx::align_size_for_constant_buffer(size);
+        assert(_cpu_offset + alignment_size <= _buffer.size());
+        if(_cpu_offset + alignment_size <= _buffer.size())
+        {
+            u8 *const address = _cpu_address + _cpu_offset;
+            _cpu_offset += alignment_size;
+            return address;
+        }
+        return nullptr;
+    }
 }

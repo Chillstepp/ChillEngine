@@ -177,7 +177,6 @@ namespace ChillEngine::graphics::d3d12
 
     
     /*Depth Buffer*/
-    
     class d3d12_depth_buffer
     {
     public:
@@ -212,5 +211,129 @@ namespace ChillEngine::graphics::d3d12
     private:
         d3d12_texture       _texture{};
         descriptor_handle   _dsv{};
+    };
+
+
+    /*Buffer*/
+    struct d3d12_buffer_init_info
+    {
+        ID3D12Heap1*                        heap = nullptr;
+        const void*                         data = nullptr;
+        D3D12_RESOURCE_ALLOCATION_INFO1     allocation_info{};
+        D3D12_RESOURCE_STATES               initial_state{};
+        D3D12_RESOURCE_FLAGS                flags{ D3D12_RESOURCE_FLAG_NONE };
+        u32                                 size{0};
+        u32                                 stride{0};
+        u32                                 element_count{0};
+        u32                                 alignment{0};
+        bool                                create_uav{false};
+    };
+    
+    class d3d12_buffer
+    {
+    public:
+        d3d12_buffer() = default;
+        explicit d3d12_buffer(d3d12_buffer_init_info info, bool is_cpu_accessible);
+        DISABLE_COPY(d3d12_buffer);//buffer has resource, and we want a resource have a unique owner.
+        constexpr d3d12_buffer(d3d12_buffer&& o)
+            :_buffer(o._buffer), _gpu_address(o._gpu_address), _size(o._size)
+        {
+            o.reset();
+        }
+        constexpr d3d12_buffer& operator=(d3d12_buffer&& o)
+        {
+            assert(this != &o);
+            if(this != &o)
+            {
+                release();
+                move(o);
+            }
+            return *this;
+        }
+        ~d3d12_buffer(){release();}
+
+        void release();
+        constexpr ID3D12Resource *const buffer() const {return _buffer;}
+        constexpr D3D12_GPU_VIRTUAL_ADDRESS gpu_address() const {return _gpu_address;}
+        constexpr u32 size() const {return _size;}
+    private:
+        constexpr void move(d3d12_buffer& o)
+        {
+            _buffer = o._buffer;
+            _gpu_address = o._gpu_address;
+            _size = o._size;
+            o.reset();
+        }
+        
+        constexpr void reset()
+        {
+            _buffer = nullptr;
+            _gpu_address = 0;
+            _size = 0;
+        }
+        
+        
+        ID3D12Resource*             _buffer = nullptr;
+        D3D12_GPU_VIRTUAL_ADDRESS   _gpu_address = 0;
+        u32                         _size = 0;
+    };
+
+    class constant_buffer
+    {
+    public:
+        constant_buffer() = default;
+        explicit constant_buffer(d3d12_buffer_init_info info);
+        DISABLE_COPY_AND_MOVE(constant_buffer);
+
+        ~constant_buffer() { release(); }
+
+        void release()
+        {
+            _buffer.release();
+            _cpu_address = nullptr;
+            _cpu_offset = 0;
+        }
+        
+        constexpr void clear() {_cpu_offset = 0;}
+        
+        u8 *const allocate(u32 size);
+        
+        template<typename T>
+        T *const allocate()
+        {
+            return (T *const)allocate(sizeof(T));
+        }
+
+        constexpr ID3D12Resource *const buffer() const {return _buffer.buffer();}
+        constexpr D3D12_GPU_VIRTUAL_ADDRESS gpu_address() const {return _buffer.gpu_address();}
+        constexpr u32 size() const {return _buffer.size();}
+        constexpr u8 *const cpu_address() const {return cpu_address();}
+        
+        template<typename T>
+        constexpr D3D12_GPU_VIRTUAL_ADDRESS gpu_address(T *const allocation)
+        {
+            std::lock_guard lock{_mutex};
+            assert(_cpu_address);
+            if(!cpu_address()) return {};
+            const u8 *const address{(const u8 *const)allocation};
+            assert(address <= _cpu_address + _cpu_offset);
+            assert(address >= _cpu_address);
+            const u64 offset{(u64)(address - _cpu_address)};
+            return _buffer.gpu_address() + offset;
+        }
+
+        constexpr static d3d12_buffer_init_info get_default_init_info(u32 size)
+        {
+            assert(size);
+            d3d12_buffer_init_info info{};
+            info.size = size;
+            info.alignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+            return info;
+        }
+    private:
+        d3d12_buffer    _buffer{};
+        u8*             _cpu_address{};
+        u32             _cpu_offset{};//how much does the buffer has used.
+        std::mutex      _mutex{};
     };
 }

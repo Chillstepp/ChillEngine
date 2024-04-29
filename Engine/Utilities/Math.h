@@ -55,6 +55,14 @@ namespace ChillEngine::math {
         return ((size + mask) & ~mask);
     }
 
+    constexpr u64 align_size_up(u64 size, u64 alignment)
+    {
+        assert(alignment);
+        const u64 mask{ alignment - 1 };
+        assert(!(alignment & mask));
+        return ((size + mask) & ~mask);
+    }
+
     // Align by rounding down. Will result in a multiple of 'alignment' that is less than or equal to 'size'.
     template<u64 alignment>
     constexpr u64 align_size_down(u64 size)
