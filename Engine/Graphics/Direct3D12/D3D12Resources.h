@@ -307,7 +307,7 @@ namespace ChillEngine::graphics::d3d12
         constexpr ID3D12Resource *const buffer() const {return _buffer.buffer();}
         constexpr D3D12_GPU_VIRTUAL_ADDRESS gpu_address() const {return _buffer.gpu_address();}
         constexpr u32 size() const {return _buffer.size();}
-        constexpr u8 *const cpu_address() const {return cpu_address();}
+        constexpr u8 *const cpu_address() const {return _cpu_address;}
         
         template<typename T>
         constexpr D3D12_GPU_VIRTUAL_ADDRESS gpu_address(T *const allocation)

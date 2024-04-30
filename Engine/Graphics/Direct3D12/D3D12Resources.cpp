@@ -226,7 +226,7 @@ namespace ChillEngine::graphics::d3d12
     ////////////////////////////////d3d12 buffer/////////////////////////////
     d3d12_buffer::d3d12_buffer(d3d12_buffer_init_info info, bool is_cpu_accessible)
     {
-        assert(!_buffer & info.size && info.alignment);
+        assert(!_buffer && info.size && info.alignment);
         _size = (u32)math::align_size_up(info.size, info.alignment);
         _buffer = d3dx::create_buffer(info.data, _size, is_cpu_accessible, info.initial_state, info.flags, info.heap, info.allocation_info.Offset);
         _gpu_address = _buffer->GetGPUVirtualAddress();

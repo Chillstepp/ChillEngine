@@ -226,7 +226,7 @@ namespace ChillEngine::graphics::d3d12::content
             {
                 using params = gpass::opaque_root_parameter;
                 d3dx::d3d12_root_parameter parameters[params::count]{};
-                parameters[params::per_frame_data].as_cbv(D3D12_SHADER_VISIBILITY_ALL, 0);
+                parameters[params::global_shader_data].as_cbv(D3D12_SHADER_VISIBILITY_ALL, 0);
 
                 D3D12_SHADER_VISIBILITY buffer_visibility{};
                 D3D12_SHADER_VISIBILITY data_visibility{};
