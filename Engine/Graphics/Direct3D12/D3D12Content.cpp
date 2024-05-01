@@ -651,7 +651,7 @@ namespace ChillEngine::graphics::d3d12::content
         {
             assert(d3d12_render_item_ids && id_count);
             assert(cache.entity_ids && cache.submesh_gpu_ids && cache.material_ids &&
-                   cache.psos && cache.depth_psos);
+                   cache.gpass_psos && cache.depth_psos);
 
             std::lock_guard lock{ render_item_mutex };
 
@@ -661,7 +661,7 @@ namespace ChillEngine::graphics::d3d12::content
                 cache.entity_ids[i] = item.entity_id;
                 cache.submesh_gpu_ids[i] = item.submesh_gpu_id;
                 cache.material_ids[i] = item.material_id;
-                cache.psos[i] = pipeline_states[item.pso_id];
+                cache.gpass_psos[i] = pipeline_states[item.pso_id];
                 cache.depth_psos[i] = pipeline_states[item.depth_pso_id];
             }
         }

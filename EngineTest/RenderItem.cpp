@@ -87,7 +87,7 @@ id::id_type create_render_item(id::id_type entity_id)
     
     render_item_entity_map[item_id] = entity_id;
     //end todo.
-    return {0};
+    return item_id;
 }
 
 void destroy_render_item(id::id_type item_id)
