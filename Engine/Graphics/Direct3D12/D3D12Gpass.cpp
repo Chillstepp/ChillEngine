@@ -348,7 +348,7 @@ namespace ChillEngine::graphics::d3d12::gpass
 
             set_root_parameters(cmd_list, i);
             const D3D12_INDEX_BUFFER_VIEW& ibv = cache.index_buffer_views[i];
-            const u32 index_count = ((ibv.SizeInBytes >> ibv.Format) == DXGI_FORMAT_R16_UINT) ? 1 : 2;
+            const u32 index_count = ibv.SizeInBytes >> (ibv.Format == DXGI_FORMAT_R16_UINT ? 1 : 2);
             cmd_list->IASetIndexBuffer(&ibv);
             cmd_list->IASetPrimitiveTopology(cache.primitive_topologies[i]);
             cmd_list->DrawIndexedInstanced(index_count, 1, 0, 0, 0);

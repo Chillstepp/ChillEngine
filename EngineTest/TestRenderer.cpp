@@ -154,7 +154,7 @@ LRESULT win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 game_entity::entity create_one_game_entity(bool is_camera)
 {
     transform::init_info transform_info{};
-    math::v3a rot{ 0.25f, is_camera ? 3.14f : 0.f, 0 };
+    math::v3a rot{ 0.0f, is_camera ? 3.14f : 0.f, 0 };
     DirectX::XMVECTOR quat{ DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&rot)) };
     math::v4a rot_quat;
     DirectX::XMStoreFloat4A(&rot_quat, quat);

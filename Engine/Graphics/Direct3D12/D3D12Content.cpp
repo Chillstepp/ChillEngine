@@ -26,10 +26,10 @@ namespace ChillEngine::graphics::d3d12::content
         struct submesh_view
         {
             D3D12_VERTEX_BUFFER_VIEW        position_buffer_view{};
-            D3D12_INDEX_BUFFER_VIEW         index_buffer_view{};
             D3D12_VERTEX_BUFFER_VIEW        element_buffer_view{};
-            u32                             elements_type{};
+            D3D12_INDEX_BUFFER_VIEW         index_buffer_view{};
             D3D_PRIMITIVE_TOPOLOGY          primitive_topology;
+            u32                             elements_type{};
         };
 
         utl::free_list<ID3D12Resource*>     submesh_buffers{};
@@ -409,7 +409,7 @@ namespace ChillEngine::graphics::d3d12::content
             const u32 primitive_topology = blob.read<u32>();
 
             //
-            const u32 index_size = vertex_count < (1<<16) ? sizeof(u16) : sizeof(u32);
+            const u32 index_size = (vertex_count < (1<<16)) ? sizeof(u16) : sizeof(u32);
             
             const u32 position_buffer_size = sizeof(math::v3) * vertex_count;
             const u32 element_buffer_size = element_size * vertex_count;
@@ -470,7 +470,7 @@ namespace ChillEngine::graphics::d3d12::content
             {
                 const submesh_view& view{submesh_views[gpu_ids[i]]};
                 cache.posistion_buffers[i] = view.position_buffer_view.BufferLocation;
-                cache.element_buffers[i] = view.position_buffer_view.BufferLocation;
+                cache.element_buffers[i] = view.element_buffer_view.BufferLocation;
                 cache.index_buffer_views[i] = view.index_buffer_view;
                 cache.primitive_topologies[i] = view.primitive_topology;
                 cache.elements_types[i] = view.elements_type;
